@@ -12,16 +12,22 @@ body{
     flex-wrap: wrap;
     position:absolute;
     top: 50%;
-    transform:translate(0,-50%);
+    transform:translate(0,-60%);
     max-height: fit-content;
     max-width: 600px;
     border: 2px solid black;
     padding: 50px;
-    gap: 50px
+    gap: 50px;
+    border-radius: 5%;
 }
 
 .court{
     height: 300px;
     width: 200px;
     border: 1px solid black;
+    border-radius: 10%;
+    color: black;
+    font-size: 1.8rem;
+    text-align: center;
+    padding: 20px 0;
 }
