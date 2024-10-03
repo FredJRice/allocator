@@ -1,9 +1,8 @@
 'use strict';
 
-let player_pool =[
-    'Player_1',
-    'Player_2',
-    'Player_3',
-    'Player_4',
-    
-]
+let player_pool =["John","Tim","Roger","Kevin","Sid","Fred","Arnold","Peter","Jim","Ken","Claire","Owen"];
+
+let current_player_pool =[];
+
+
+
