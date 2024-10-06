@@ -21,6 +21,6 @@ court4.innerHTML = "Court 4" +"<br><br>"+"<strong>"+ player_pool[14]+"</strong><
 
 
 // function addPlayer{
-
+    
 // }
 
