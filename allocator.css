@@ -13,8 +13,23 @@ body{
     position:absolute;
     top: 50%;
     transform:translate(0,-60%);
-    max-height: fit-content;
-    max-width: 600px;
+    height: 1000px;
+    width: 1000px;
+    border: 2px solid black;
+    padding: 50px;
+    gap: 50px;
+    border-radius: 5%;
+}
+
+.courtContainer{
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    position:absolute;
+    top: 50%;
+    transform:translate(0,-60%);
+    height: 800px;
+    width: 600px;
     border: 2px solid black;
     padding: 50px;
     gap: 50px;
@@ -27,7 +42,7 @@ body{
     border: 1px solid black;
     border-radius: 10%;
     color: black;
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     text-align: center;
     padding: 20px 0;
 }
