@@ -9,26 +9,19 @@ let player_pool =["Jack Black","Tim Allen","Roger Rabbit",
 
 let player_queue =[];
 
-
 let queue = document.querySelector('#playerQueue');
-
-let text = "";
 
 player_pool.forEach(addPlayerToQueue);
 
-queue.innerHTML = text;
-
 function addPlayerToQueue(item){
-    text += item;
+    queue.innerHTML += "<div>"+"<br>" +item+"<br></div>";
 }
 
-function addPlayerToQueue(){
-    
-}
 
-function displayPlayerQueue(){
 
-}
+// function displayPlayerQueue(){
+
+// }
 
 let court1 = document.querySelector('#one');
 let court2 = document.querySelector('#two');

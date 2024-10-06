@@ -29,8 +29,8 @@ body{
     width: 250px;
     left: 50px;
     top: 120px;
-    border-radius: 20px;
     padding: 20px;
+    overflow:scroll;
 }
 
 .courtContainer{
