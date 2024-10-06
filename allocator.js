@@ -1,8 +1,13 @@
 'use strict';
 
-let player_pool =["John Black","Tim Oliver","Roger Keen","Kevin Otter","Sid Raymond","Fred Palmer","Arnold Butcher","Peter Kay","Jim Carrey","Ken Last","Claire Danes","Owen Wilson"];
+let player_pool =["Jack Black","Tim Allen","Roger Rabbit",
+    "Arnold Schwarzenegger","Johnney Depp","Kate Winslet",
+    "Christian Bale","Peter Kay","Jim Carrey",
+    "Morgan freeman","Claire Danes","Nicolas Cage",
+    "Bruce Willis", "Roger Moore", "Catherine Zeta_jones",
+    "Clive Owen", "Jack Nicholson", "Cate Blanchett"];
 
-let current_player_pool =[];
+let player_queue =[];
 
 let court1 = document.querySelector('#one');
 
