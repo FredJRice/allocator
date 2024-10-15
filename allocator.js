@@ -9,6 +9,7 @@ let player_pool =["Jack Black","Tim Allen","Roger Rabbit",
 
 addPlayer.addEventListener('click',addFromPoolToQueue)
 let pool = document.querySelector('#poolModal');
+let main = document.querySelector('#mainContainer');
 let player_queue = []
 
 function addFromPoolToQueue(){
@@ -17,11 +18,11 @@ function addFromPoolToQueue(){
     console.log(player_queue)
 }
 
-// window.onclick = function(event) {
-//     if (event.target == poolModal) {
-//       pool.style.display = "none";
-//     }
-//   }
+window.onclick = function(event) {
+    if (event.target == main) {
+      pool.style.display = "none";
+    }
+  }
 
 
 
