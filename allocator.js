@@ -10,6 +10,11 @@ let player_pool =["Jack Black","Tim Allen","Roger Rabbit",
 addPlayerButton.addEventListener('click',addPool)
 let pool = document.querySelector('#poolModal');
 let main = document.querySelector('#mainContainer');
+let queue = document.querySelector('#playerQueue');
+let court1 = document.querySelector('#one');
+let court2 = document.querySelector('#two');
+let court3 = document.querySelector('#three');
+let court4 = document.querySelector('#four');
 let player_queue = []
     
 function addPool(){
@@ -20,10 +25,14 @@ function addPool(){
 })
 }
 
-// function addFromPoolToQueue(){
-//     pool.style.display = "block";
-//     player_queue = player_pool.pop()
-// }
+
+function addFromPoolToQueue(){
+    queue.innerHTML ="";
+    player_queue = player_pool.pop()
+}
+
+
+
 /* Closes the window if clicked outside the pool modal*/
 window.onclick = function(event) {
     if (event.target == main) {
@@ -31,11 +40,7 @@ window.onclick = function(event) {
     }
   }
 
-let queue = document.querySelector('#playerQueue');
-let court1 = document.querySelector('#one');
-let court2 = document.querySelector('#two');
-let court3 = document.querySelector('#three');
-let court4 = document.querySelector('#four');
+
 
 court1.addEventListener('click',addPlayersCourt1)
 court2.addEventListener('click',addPlayersCourt2)
