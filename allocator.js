@@ -5,51 +5,37 @@ let player_pool =["Jack Black","Tim Allen","Roger Rabbit",
     "Christian Bale","Peter Kay","Jim Carrey",
     "Morgan freeman","Claire Danes","Nicolas Cage",
     "Bruce Willis", "Roger Moore", "Catherine Zeta-Jones",
-    "Clive Owen", "Jack Nicholson", "Cate Blanchett"];
+    "Clive Owen", "Jack Nicholson", "Cate Blanchett","Fred Rice"];
 
-addPlayer.addEventListener('click',addFromPoolToQueue)
+addPlayerButton.addEventListener('click',addPool)
 let pool = document.querySelector('#poolModal');
 let main = document.querySelector('#mainContainer');
 let player_queue = []
-
-function addFromPoolToQueue(){
+    
+function addPool(){
     pool.style.display = "block";
-    player_queue = player_pool.pop()
-    console.log(player_queue)
+    pool.innerHTML = "";
+    player_pool.forEach((player,index) =>{
+    pool.innerHTML += `<div class="poolPlayer" id=${index}>${player}</div>`;
+})
 }
 
+// function addFromPoolToQueue(){
+//     pool.style.display = "block";
+//     player_queue = player_pool.pop()
+// }
+/* Closes the window if clicked outside the pool modal*/
 window.onclick = function(event) {
     if (event.target == main) {
       pool.style.display = "none";
     }
   }
 
-
-
 let queue = document.querySelector('#playerQueue');
-
-
-
-// function addPlayerToQueue(){ 
-   
-//     // queue.innerHTML += "<div>"+"<br>" + returned_players +"<br></div>";
-   
-//     }
-
-
-
-
-// function displayPlayerQueue(){
-
-// }
-
 let court1 = document.querySelector('#one');
 let court2 = document.querySelector('#two');
 let court3 = document.querySelector('#three');
 let court4 = document.querySelector('#four');
-
-
-
 
 court1.addEventListener('click',addPlayersCourt1)
 court2.addEventListener('click',addPlayersCourt2)
