@@ -8,6 +8,7 @@ let player_pool =["Jack Black","Tim Allen","Roger Rabbit",
     "Clive Owen", "Jack Nicholson", "Cate Blanchett","Fred Rice"];
 
 addPlayerButton.addEventListener('click',addPool)
+
 let pool = document.querySelector('#poolModal');
 let main = document.querySelector('#mainContainer');
 let queue = document.querySelector('#playerQueue');
@@ -21,15 +22,17 @@ function addPool(){
     pool.style.display = "block";
     pool.innerHTML = "";
     player_pool.forEach((player,index) =>{
-    pool.innerHTML += `<div class="poolPlayer" id=${index}>${player}</div>`;
+    pool.innerHTML += `<button class="poolPlayer" id=${index}>${player}</button>`;
 })
 }
+let poolPlayer = document.querySelector('#poolPlayer')
 
+poolPlayer.addEventListener('click', addFromPoolToQueue)
 
 function addFromPoolToQueue(){
-    queue.innerHTML ="";
-    player_queue = player_pool.pop()
+    console.log('It works!')
 }
+
 
 
 
