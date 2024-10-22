@@ -7,7 +7,7 @@ let player_pool =["Jack Black","Tim Allen","Roger Rabbit",
     "Bruce Willis", "Roger Moore", "Catherine Zeta-Jones",
     "Clive Owen", "Jack Nicholson", "Cate Blanchett","Fred Rice"];
 
-addPlayerButton.addEventListener('click',addPool)
+
 
 let pool = document.querySelector('#poolModal');
 let main = document.querySelector('#mainContainer');
@@ -17,24 +17,29 @@ let court2 = document.querySelector('#two');
 let court3 = document.querySelector('#three');
 let court4 = document.querySelector('#four');
 let player_queue = []
-    
+
+
+addPlayerButton.addEventListener('click',addPool)
+// Adds players from the player_pool array to the poolModal
 function addPool(){
     pool.style.display = "block";
     pool.innerHTML = "";
     player_pool.forEach((player,index) =>{
     pool.innerHTML += `<button class="poolPlayer" id=${index}>${player}</button>`;
 })
+// Adds an event listener to each player button in the pool modal
+player_pool.forEach((player, index) => {
+    let personInPool = document.getElementById(index.toString());
+    if(personInPool){
+        personInPool.addEventListener('click',() => addFromPoolToQueue(player))
+    }
+})
 }
-let poolPlayer = document.querySelector('#poolPlayer')
 
-poolPlayer.addEventListener('click',addFromPoolToQueue)
-
-function addFromPoolToQueue(){
-    console.log('It works!')
+function addFromPoolToQueue(player){
+    queue.innerHTML += `<p>${player}</p>`
+    console.log(queue)
 }
-
-
-
 
 /* Closes the window if clicked outside the pool modal*/
 window.onclick = function(event) {
@@ -43,16 +48,14 @@ window.onclick = function(event) {
     }
   }
 
-
-
 court1.addEventListener('click',addPlayersCourt1)
 court2.addEventListener('click',addPlayersCourt2)
 court3.addEventListener('click',addPlayersCourt3)
 court4.addEventListener('click',addPlayersCourt4)
 
-function addPlayersCourt1(player_queue){
-    court1.innerHTML= "Court 1" +"<br><br>"+"<strong>"+ player_queue
-    +"</strong><br><br>"+"V."+"<br><br><strong>"+player_queue+"</strong>";
+function addPlayersCourt1(player){
+    court1.innerHTML= "Court 1" +"<br><br>"+"<strong>"+ player
+    +"</strong><br><br>"+"V."+"<br><br><strong>"+ player +"</strong>";
     // console.log(player_pool)
     
 }

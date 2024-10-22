@@ -31,6 +31,7 @@ body{
     padding: 10px;
     border-radius: 10px;;
 }
+
 #addPlayerButton{
     background-color: #00a0e0;
     color: white;
@@ -48,19 +49,21 @@ body{
     box-shadow: 2px 5px 2px #aaaaaa;
 }
 
+
+
 .poolModal{
     display: none;
     justify-content: center;
     flex-wrap: wrap;
     position:absolute;
-    text-align: center;
+    text-align: left;
     font-size: 2rem;
     color: white;
     background-color: #00a0e0;
     top: 60%;
     transform:translate(0,-60%);
     height: 800px;
-    width: 600px;
+    width: 550px;
     border: 2px solid black;
     padding: 50px;
     gap: 50px;
