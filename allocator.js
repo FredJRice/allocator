@@ -27,7 +27,7 @@ function addPool(){
 }
 let poolPlayer = document.querySelector('#poolPlayer')
 
-poolPlayer.addEventListener('click', addFromPoolToQueue)
+poolPlayer.addEventListener('click',addFromPoolToQueue)
 
 function addFromPoolToQueue(){
     console.log('It works!')
