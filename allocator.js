@@ -1,6 +1,7 @@
 "use strict";
 
 let player_pool = [
+  "Riley Rice",
   "Jack Black",
   "Tim Allen",
   "Roger Rabbit",
@@ -56,13 +57,23 @@ function addFromPoolToQueue(player) {
 function renderQueue() {
   queue.innerHTML = "<h3>Player Queue</h3>";
   player_queue.forEach((name, index) => {
-    // We add 'draggable=true' and a 'data-index' to track who is who
     queue.innerHTML += `
-      <p class="draggable-player" 
-         draggable="true" 
-         ondragstart="drag(event)" 
-         id="player-${index}">${name}</p>`;
+      <div class="player-card">
+        <p class="draggable-player" 
+           draggable="true" 
+           ondragstart="drag(event)" 
+           id="player-${index}">${name}</p>
+        <button class="remove-btn-circ" onclick="removeFromQueue(${index})">×</button>
+      </div>`;
   });
+}
+
+function removeFromQueue(index) {
+  // Remove 1 element at the specified index
+  player_queue.splice(index, 1);
+  
+  // Re-render so the IDs and list update immediately
+  renderQueue();
 }
 
 /* Closes the window if clicked outside the pool modal*/
@@ -78,42 +89,36 @@ court3.addEventListener("click", () => allocatePlayers(court3, "Court 3"));
 court4.addEventListener("click", () => allocatePlayers(court4, "Court 4"));
 
 function allocatePlayers(courtElement, courtName) {
-  // 1. Check if there are players currently on this court to remove
   const currentP1 = courtElement.getAttribute("data-p1");
   const currentP2 = courtElement.getAttribute("data-p2");
 
   if (currentP1 && currentP2) {
-    // Add the old players back to the end of the queue array
     player_queue.push(currentP1, currentP2);
   }
 
-  // 2. Check if we have enough new players to fill the court
   if (player_queue.length >= 2) {
     let nextP1 = player_queue.shift();
     let nextP2 = player_queue.shift();
 
-    // 3. Update the court UI and store the names in data attributes
     courtElement.setAttribute("data-p1", nextP1);
     courtElement.setAttribute("data-p2", nextP2);
 
+    // Injecting the cards into the court
     courtElement.innerHTML = `
-      <strong>${courtName}</strong><br><br>
-      <span class="player-name">${nextP1}</span><br>
-      vs<br>
-      <span class="player-name">${nextP2}</span>
+      <strong>${courtName}</strong>
+      <div class="court-matchup">
+        ${createPlayerCard(nextP1, 0, false)}
+        <div class="vs-text">vs</div>
+        ${createPlayerCard(nextP2, 1, false)}
+      </div>
     `;
   } else {
-    // If queue is empty or only 1 person, just clear the court
     courtElement.removeAttribute("data-p1");
     courtElement.removeAttribute("data-p2");
     courtElement.innerHTML = `<strong>${courtName}</strong><br><br>Empty`;
-    alert("Not enough players in queue to start a new match.");
   }
-
-  // 4. Refresh the visual queue
   renderQueue();
 }
-
 // This runs when you start clicking and moving a name
 function drag(event) {
   event.dataTransfer.setData("text", event.target.id);
@@ -157,5 +162,34 @@ function handleDropOnCourt(courtElement, playerName, playerID) {
     renderQueue(); // Refresh the side list
   } else {
     alert("This court already has 2 players assigned!");
+  }
+}
+
+function createPlayerCard(name, index, isQueue = true) {
+  // If it's on a court, we might want a different ID or logic
+  const id = isQueue ? `player-${index}` : `court-player-${index}`;
+  
+  return `
+    <div class="player-card">
+      <span class="draggable-player" 
+            draggable="true" 
+            ondragstart="drag(event)" 
+            id="${id}">${name}</span>
+      <button class="remove-btn-circ" onclick="removeAnywhere('${name}', ${isQueue}, ${index})">×</button>
+    </div>`;
+}
+function removeAnywhere(name, isQueue, index) {
+  if (isQueue) {
+    player_queue.splice(index, 1);
+    renderQueue();
+  } else {
+    // If removed from a court, we find which court they were on and clear it
+    // This looks for the parent court element and resets it
+    const playerCard = event.target.closest('.player-card');
+    const courtElement = playerCard.closest('.court'); // Assumes your courts have class="court"
+    
+    courtElement.removeAttribute("data-p1");
+    courtElement.removeAttribute("data-p2");
+    courtElement.innerHTML = `<strong>Court</strong><br><br>Empty`;
   }
 }
