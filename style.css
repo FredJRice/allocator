@@ -1,0 +1,138 @@
+:root {
+    --primary-bg: #f0f2f5;
+    --court-bg: #ffffff;
+    --accent-color: #2c3e50;
+    --delete-red: #ff4757;
+    --free-green: #2ecc71;
+    --timer-bg: #333333;
+}
+
+/* 1. Prevent the whole page from bouncing/scrolling */
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden; 
+    font-family: -apple-system, system-ui, sans-serif;
+    background-color: var(--primary-bg);
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 2. Top Section (Header + Settings) */
+header, #settings {
+    flex-shrink: 0;
+    text-align: center;
+    background: white;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+#settings {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding-bottom: 15px;
+}
+
+/* 3. Main Content Area (Sidebar | Courts) */
+main {
+    display: grid;
+    grid-template-columns: 320px 1fr; /* Sidebar fixed, Courts fill rest */
+    gap: 20px;
+    padding: 20px;
+    flex-grow: 1;
+    overflow: hidden; /* Important for inner scrolling */
+    width: 95%;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* 4. Sidebar: Two Equal 50/50 Boxes */
+#sidePanel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100%;
+}
+
+.column {
+    flex: 1; /* This forces exactly 50% height */
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    min-height: 0; /* Allows content to scroll instead of pushing box down */
+}
+
+.pool-container, .queue-container {
+    flex-grow: 1;
+    overflow-y: auto; /* Enable scrolling inside */
+    border: 1px dashed #cbd5e0;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 8px;
+}
+
+/* 5. Court Grid: Two-by-Two scrolling */
+.court-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 280px);
+    gap: 20px;
+    justify-content: center;
+    overflow-y: auto; /* Courts scroll if they exceed screen height */
+    padding-right: 10px;
+}
+
+.court {
+    background: white;
+    border: 2px solid var(--accent-color);
+    border-radius: 12px;
+    padding: 15px;
+    width: 280px;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+/* 6. Player Cards & Buttons */
+.player-card {
+    position: relative;
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 10px 10px 10px 35px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: grab;
+}
+
+.delete-btn {
+    position: absolute;
+    top: 4px; left: 4px;
+    width: 22px; height: 22px;
+    background: var(--delete-red);
+    color: white; border: none; border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Modal Styling */
+.modal {
+    display: none; position: fixed; z-index: 1000;
+    left: 0; top: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+}
+
+.modal-content {
+    background: white; margin: 10% auto; padding: 30px;
+    width: 320px; border-radius: 15px; text-align: center;
+}

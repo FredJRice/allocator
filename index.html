@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Racquets Court Allocator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header><h1>Court Allocator</h1></header>
+    
+    <div id="settings">
+        <label>Courts: <input type="number" id="courtCount" value="4"></label>
+        <label>Players: <input type="number" id="playersPerCourt" value="2"></label>
+        <button id="applySettings">Apply</button>
+    </div>
+
+    <main>
+        <aside id="sidePanel">
+            <div class="column">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3>Player Pool</h3>
+                    <button id="openModalBtn" style="border-radius:50%; width:30px; height:30px; cursor:pointer;">+</button>
+                </div>
+                <div id="playerDatabase" class="pool-container"></div>
+            </div>
+            <div class="column">
+                <h3>Waiting Queue</h3>
+                <div id="playerQueue" class="queue-container"></div>
+            </div>
+        </aside>
+
+        <section id="courtGrid" class="court-grid"></section>
+    </main>
+
+    <div id="playerModal" class="modal">
+        <div class="modal-content">
+            <h3>Add Player</h3>
+            <input type="text" id="newPlayerName" placeholder="Name..." style="width:80%; padding:10px; margin-bottom:10px;">
+            <br>
+            <button id="addPlayerBtn" style="padding:10px 20px;">Save</button>
+            <button onclick="document.getElementById('playerModal').style.display='none'">Cancel</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
