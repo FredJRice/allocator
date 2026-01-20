@@ -3,45 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Racquets Court Allocator</title>
+    <title>Court Allocator</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header><h1>Court Allocator</h1></header>
+    <header>
+        <h1>Court Allocator</h1>
+    </header>
     
-    <div id="settings">
+    <section id="settings">
         <label>Courts: <input type="number" id="courtCount" value="4"></label>
         <label>Players: <input type="number" id="playersPerCourt" value="2"></label>
         <button id="applySettings">Apply</button>
-    </div>
+    </section>
 
     <main>
         <aside id="sidePanel">
             <div class="column">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <h3>Player Pool</h3>
-                    <button id="openModalBtn" style="border-radius:50%; width:30px; height:30px; cursor:pointer;">+</button>
+                <div class="header-with-action">
+                    <h3>Waiting Queue</h3>
+                    <button id="openPoolModalBtn" class="plus-btn">+</button>
                 </div>
-                <div id="playerDatabase" class="pool-container"></div>
-            </div>
-            <div class="column">
-                <h3>Waiting Queue</h3>
-                <div id="playerQueue" class="queue-container"></div>
+                <div id="playerQueue" class="queue-container">
+                    </div>
             </div>
         </aside>
 
-        <section id="courtGrid" class="court-grid"></section>
+        <section id="courtGrid" class="court-grid">
+            </section>
     </main>
 
-    <div id="playerModal" class="modal">
-        <div class="modal-content">
-            <h3>Add Player</h3>
-            <input type="text" id="newPlayerName" placeholder="Name..." style="width:80%; padding:10px; margin-bottom:10px;">
-            <br>
-            <button id="addPlayerBtn" style="padding:10px 20px;">Save</button>
-            <button onclick="document.getElementById('playerModal').style.display='none'">Cancel</button>
+    <div id="poolModal" class="modal">
+        <div class="modal-content pool-modal-content">
+            <div class="header-with-action">
+                <h3>Select Players from Pool</h3>
+                <button id="openAddPlayerModalBtn" class="plus-btn">+</button>
+            </div>
+            <div id="playerDatabase" class="pool-container modal-pool-grid">
+                </div>
+            <button class="close-pool-btn" onclick="closePool()">Done</button>
         </div>
     </div>
+
+    <div id="addPlayerModal" class="modal">
+        <div class="modal-content">
+            <h3>Add New Player</h3>
+            <input type="text" id="newPlayerName" placeholder="Enter Name..." style="width:80%; padding:10px; margin-bottom:10px;">
+            <br>
+            <div style="display: flex; justify-content: center; gap: 10px;">
+                <button id="saveNewPlayerBtn" style="padding: 10px 15px;">Save to Pool</button>
+                <button onclick="closeAddPlayer()" style="padding: 10px 15px;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

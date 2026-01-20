@@ -7,13 +7,22 @@
     --timer-bg: #333333;
 }
 
-/* 1. Prevent the whole page from bouncing/scrolling */
+/* 1. Global Reset & Body */
 html, body {
     height: 100%;
+    width: 100vw;
     margin: 0;
-    overflow: hidden; 
+    padding: 0;
+    overflow: hidden;
     font-family: -apple-system, system-ui, sans-serif;
     background-color: var(--primary-bg);
+    background-image: url('squash-graphic-vector-quality.jpeg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 25%;
+
 }
 
 body {
@@ -21,74 +30,105 @@ body {
     flex-direction: column;
 }
 
-/* 2. Top Section (Header + Settings) */
-header, #settings {
-    flex-shrink: 0;
-    text-align: center;
+/* 2. Centered Containers (80% Width) */
+header, #settings, main {
+    width: 50%;
+    max-width: 1400px;
+    margin: 0 auto; /* Centers everything */
+    box-sizing: border-box;
+}
+
+header {
     background: white;
-    padding: 10px;
+    text-align: center;
+    margin-top: 20px;
+    padding: 15px;
     border-bottom: 1px solid #ddd;
+    flex-shrink: 0;
+    border-radius: 8px 8px 0 0;
 }
 
 #settings {
     display: flex;
     justify-content: center;
     gap: 15px;
-    padding-bottom: 15px;
+    align-items: center;
+    background: white;
+    padding: 10px;
+    border-radius: 0 0 8px 8px;
+    border-bottom: 1px solid #ddd;
+    flex-shrink: 0;
+}
+
+#settings input {
+    width: 50px;
+    padding: 5px;
 }
 
 /* 3. Main Content Area (Sidebar | Courts) */
 main {
     display: grid;
-    grid-template-columns: 320px 1fr; /* Sidebar fixed, Courts fill rest */
-    gap: 20px;
-    padding: 20px;
-    flex-grow: 1;
-    overflow: hidden; /* Important for inner scrolling */
-    width: 95%;
-    max-width: 1600px;
+    grid-template-columns: 340px 1fr; 
+    width: 50%;
+    max-width: 1400px;
     margin: 0 auto;
+    gap: 20px;
+    padding: 20px 0;
+    height: auto;
+    align-items: start;
+    overflow: hidden; 
 }
 
-/* 4. Sidebar: Two Equal 50/50 Boxes */
+/* 4. Sidebar: 100% Waiting Queue */
 #sidePanel {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    height: 100%;
+    height: 580px;
 }
 
 .column {
-    flex: 1; /* This forces exactly 50% height */
     display: flex;
     flex-direction: column;
     background: white;
     border-radius: 12px;
     padding: 15px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    min-height: 0; /* Allows content to scroll instead of pushing box down */
+    height: 100%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    min-height: 580px; /* Important for inner scroll */
+    box-sizing: border-box;
 }
 
-.pool-container, .queue-container {
-    flex-grow: 1;
-    overflow-y: auto; /* Enable scrolling inside */
+.header-with-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.queue-container, .pool-container {
+    flex: 1;
+    overflow-y: auto;
     border: 1px dashed #cbd5e0;
     border-radius: 8px;
-    padding: 10px;
+    background: #fafafa;
+    padding: 15px;
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
-    gap: 8px;
+    gap: 15px; /* Space for the offset delete buttons */
 }
 
-/* 5. Court Grid: Two-by-Two scrolling */
+/* 5. Right Courts Area */
 .court-grid {
     display: grid;
-    grid-template-columns: repeat(2, 280px);
+    grid-template-columns: repeat(2, 280px); 
     gap: 20px;
     justify-content: center;
-    overflow-y: auto; /* Courts scroll if they exceed screen height */
-    padding-right: 10px;
+    height: 580px;
+    overflow-y: auto; 
+    padding-bottom: 20px;
+    scrollbar-width:auto;
+    padding-right: 5px; /* Prevents cutting off last court */
 }
 
 .court {
@@ -97,42 +137,159 @@ main {
     border-radius: 12px;
     padding: 15px;
     width: 280px;
-    min-height: 220px;
+    height: 280px;
     display: flex;
+    text-align: center;
     flex-direction: column;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     box-sizing: border-box;
 }
 
-/* 6. Player Cards & Buttons */
+/* 6. Player Cards & Circle Delete Button */
 .player-card {
-    position: relative;
+    position: relative; /* Anchor for the absolute X button */
     background: #fff;
     border: 1px solid #ddd;
-    padding: 10px 10px 10px 35px;
-    border-radius: 6px;
+    padding: 12px 10px 12px 25px;
+    border-radius: 8px;
     font-size: 14px;
     font-weight: 600;
     cursor: grab;
+    width: fit-content;
+    min-width: 90px;
+}
+
+/* The Greyed-out state */
+.player-card.active-in-system {
+    background-color: #e2e8f0;
+    color: #94a3b8;
+    border-color: #cbd5e0;
+    cursor: not-allowed;
+    opacity: 0.7;
 }
 
 .delete-btn {
     position: absolute;
-    top: 4px; left: 4px;
-    width: 22px; height: 22px;
-    background: var(--delete-red);
-    color: white; border: none; border-radius: 4px;
-    cursor: pointer;
+    top: -10px; /* Shift up onto edge */
+    left: -10px; /* Shift left onto edge */
+    width: 22px;
+    height: 22px;
+    background-color: var(--delete-red);
+    color: white;
+    border: 2px solid white; /* Black border */
+    border-radius: 50%; /* Circle */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
     font-weight: bold;
+    cursor: pointer;
+    z-index: 10;
+    line-height: 1;
 }
 
-/* Modal Styling */
+/* 7. Modal Styling */
 .modal {
-    display: none; position: fixed; z-index: 1000;
+    display: none; 
+    position: fixed;
+    z-index: 1000;
     left: 0; top: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.6);
 }
 
 .modal-content {
-    background: white; margin: 10% auto; padding: 30px;
-    width: 320px; border-radius: 15px; text-align: center;
+    background: white;
+    margin: 10% auto;
+    padding: 30px;
+    width: 300px;
+    border-radius: 15px;
+    text-align: center;
+    position: relative;
+}
+
+.pool-modal-content {
+    width: 600px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-pool-grid {
+    flex-grow: 1;
+    margin: 15px 0;
+}
+
+/* Buttons & Labels */
+.plus-btn {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-pool-btn {
+    padding: 10px 20px;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.free-label {
+    color: var(--free-green);
+    font-weight: bold;
+    font-size: 1.5rem;
+    text-align: center;
+    margin: auto;
+}
+
+.timer-display {
+    background: var(--timer-bg);
+    color: white;
+    text-align: center;
+    padding: 5px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 1.2rem;
+    margin-top: auto;
+}
+/* Container inside the court that holds players */
+.slots-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column; /* Stack players vertically */
+    align-items: center;    /* Center players horizontally */
+    justify-content: center; /* Center the whole group vertically */
+    gap: 10px;
+}
+
+/* The VS label between players */
+.vs-text {
+    font-weight: 800;
+    color: #718096;
+    font-size: 0.9rem;
+    margin: 5px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Ensure cards don't stretch to full width inside the court */
+.court .player-card {
+    margin: 0; 
+    width: 180px; /* Fixed width for consistency on court */
+    text-align: center;
+    padding-left: 10px; /* Resetting padding since we want it centered */
+}
+
+/* Adjust delete button for centered cards */
+.court .delete-btn {
+    left: -8px; 
 }
