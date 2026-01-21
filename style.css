@@ -367,7 +367,7 @@ main {
         overflow-y: auto;
         display: block !important; /* Stack courts vertically */
         padding: 5px;
-        gap: 8px
+        gap: 8px;
         scroll-snap-type: y mandatory;
     }
 
