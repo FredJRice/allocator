@@ -16,7 +16,7 @@ html, body {
     overflow: hidden;
     font-family: -apple-system, system-ui, sans-serif;
     background-color: var(--primary-bg);
-    background-image: url('squash-graphic-vector-quality.jpeg');
+    //background-image: url('squash-graphic-vector-quality.jpeg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
