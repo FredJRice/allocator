@@ -16,7 +16,6 @@ html, body {
     overflow: hidden;
     font-family: -apple-system, system-ui, sans-serif;
     background-color: var(--primary-bg);
-    //background-image: url('squash-graphic-vector-quality.jpeg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -32,7 +31,7 @@ body {
 
 /* 2. Centered Containers (80% Width) */
 header, #settings, main {
-    width: 50%;
+    width: 95%;
     max-width: 1400px;
     margin: 0 auto; /* Centers everything */
     box-sizing: border-box;
@@ -320,4 +319,82 @@ main {
 
 .add-all-btn:hover {
     background-color: #218838;
+}
+
+/* --- EXISTING DESKTOP STYLES ABOVE --- */
+
+/* --- Tablet & Phone Specific (Screens under 1024px) --- */
+@media (max-width: 1024px) {
+    /* Reset Global Widths for mobile */
+    header, #settings, .app-container {
+        width: 100% !important;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    /* 1. Force the Split-Screen */
+    .app-container {
+        display: flex !important;
+        flex-direction: row !important;
+        height: calc(100vh - 120px); /* Subtracts header/settings height */
+        width: 100vw;
+        overflow: hidden;
+        padding: 0 !important;
+    }
+
+    /* 2. Left Sidebar (The Queue) */
+    #sidePanel {
+        width: 180px; /* Wider for thumbs */
+        height: 95% !important;
+        overflow-y: auto;
+        background-color: #f8f9fa;
+        border-right: 2px solid #ddd;
+        flex-shrink: 0;
+        padding: 10px;
+    }
+    
+    .column {
+        min-height: auto !important; /* Remove the fixed 580px height from desktop */
+        height: 100%;
+        padding: 5px;
+    }
+
+    /* 3. Right Side (The Court Grid) */
+    #courtGrid {
+        flex-grow: 1;
+        height: 100%;
+        overflow-y: auto;
+        display: block !important; /* Stack courts vertically */
+        padding: 15px;
+        scroll-snap-type: y mandatory;
+    }
+
+    /* 4. Two-Court View Logic */
+    .court {
+        width: 100% !important; /* Full width of the right column */
+        height: 42vh !important; /* Fits two on screen */
+        margin-bottom: 15px;
+        scroll-snap-align: start;
+        border: 4px solid #ccc;
+    }
+
+    /* 5. The Selection Glow */
+    .court.focused {
+        border-color: #007bff !important;
+        box-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
+        background-color: #f0f7ff;
+    }
+
+    /* Target larger cards for thumbs */
+    .player-card {
+        width: 90% !important;
+        font-size: 1.1rem;
+        padding: 15px 10px 15px 30px !important;
+    }
+
+    .delete-btn {
+        width: 32px !important;
+        height: 32px !important;
+        left: -12px !important;
+    }
 }

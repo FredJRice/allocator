@@ -17,6 +17,9 @@ Software Requirements:
 - Eventually I would like to make an iPhone app out of it but not straight away.
 - It would be nice if the racquet club's name could be displayed at the top.
 
+Responsiveness
+- 
+
 Nice to haves:
 
 - Court renaming
