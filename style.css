@@ -199,10 +199,14 @@ main {
 
 .modal-content {
     background: white;
-    margin: 10% auto;
-    padding: 30px;
-    width: 300px;
-    border-radius: 15px;
+    margin: 5% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 500px;
+    height: 50vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
     text-align: center;
     position: relative;
 }
@@ -212,6 +216,15 @@ main {
     max-height: 80vh;
     display: flex;
     flex-direction: column;
+}
+
+/* The area where players are listed */
+#playerDatabase {
+    flex-grow: 1;    /* Takes up all available space in the modal */
+    overflow-y: auto; /* Adds the scrollbar when names overflow */
+    border: 1px solid #eee;
+    padding: 10px;
+    margin-top: 10px;
 }
 
 .modal-pool-grid {
@@ -292,4 +305,19 @@ main {
 /* Adjust delete button for centered cards */
 .court .delete-btn {
     left: -8px; 
+}
+
+.add-all-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.add-all-btn:hover {
+    background-color: #218838;
 }

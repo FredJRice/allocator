@@ -262,5 +262,47 @@ function stopTimer(courtId) {
     if (el) el.innerText = "00:00:00";
 }
 
+window.addAllToQueue = function() {
+    console.log("Add All button clicked!");
+
+    // 1. Get names that are NOT currently active
+    // We use your existing 'players' array and 'isPlayerActive' check
+    const availablePlayers = players.filter(name => !isPlayerActive(name));
+    
+    console.log("Available to add:", availablePlayers);
+
+    if (availablePlayers.length === 0) {
+        alert("All players are already in the system!");
+        return;
+    }
+
+    // 2. Add them to the queue
+    availablePlayers.forEach(name => {
+        queue.push({ 
+            name: name, 
+            id: Date.now() + Math.random() 
+        });
+    });
+
+    // 3. Refresh everything
+    renderQueue();
+    renderDatabase();
+    
+    console.log("Queue updated!", queue);
+};
+
 window.deleteFromDb = (e, index) => { e.stopPropagation(); if (confirm("Delete?")) { players.splice(index, 1); localStorage.setItem('racquetPlayers', JSON.stringify(players)); renderDatabase(); } };
 function removeFromQueue(e, index) { e.stopPropagation(); queue.splice(index, 1); renderQueue(); }
+
+function isPlayerActive(name) {
+    // Check if name is in the sidebar queue
+    const inQueue = queue.some(p => p.name === name);
+    
+    // Check if name is currently on any court
+    const allCourtCards = document.querySelectorAll('.court .player-card');
+    const inCourt = Array.from(allCourtCards).some(card => {
+        return card.getAttribute('data-name') === name;
+    });
+    
+    return inQueue || inCourt;
+}

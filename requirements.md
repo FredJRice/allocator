@@ -16,3 +16,10 @@ Software Requirements:
 - The app does not need to access any data over the internet but displaying the time and date might be nice.
 - Eventually I would like to make an iPhone app out of it but not straight away.
 - It would be nice if the racquet club's name could be displayed at the top.
+
+Nice to haves:
+
+- Court renaming
+- Advanced timers - Change colour after 10 minutes, alarm, etc...
+- Export/import database
+- 

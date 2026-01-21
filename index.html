@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Court Allocator</title>
+    <title>Court Queue</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>Court Allocator</h1>
+        <h1>Lansdown Racquets Club - Court Queue</h1>
     </header>
     
     <section id="settings">
@@ -34,16 +34,20 @@
     </main>
 
     <div id="poolModal" class="modal">
-        <div class="modal-content pool-modal-content">
-            <div class="header-with-action">
-                <h3>Select Players from Pool</h3>
-                <button id="openAddPlayerModalBtn" class="plus-btn">+</button>
-            </div>
-            <div id="playerDatabase" class="pool-container modal-pool-grid">
-                </div>
-            <button class="close-pool-btn" onclick="closePool()">Done</button>
+    <div class="modal-content pool-modal-content">
+        <div class="header-with-action">
+            <h3>Select Players from Pool</h3>
+            <button id="openAddPlayerModalBtn" class="plus-btn">+</button>
         </div>
+        
+        <button onclick="addAllToQueue()" class="add-all-btn">Add All to Queue</button>
+        
+        <div id="playerDatabase" class="pool-container modal-pool-grid">
+        </div>
+        
+        <button class="close-pool-btn" onclick="closePool()">Done</button>
     </div>
+</div>
 
     <div id="addPlayerModal" class="modal">
         <div class="modal-content">
