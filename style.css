@@ -169,18 +169,18 @@ main {
 
 .delete-btn {
     position: absolute;
-    top: -10px; /* Shift up onto edge */
-    left: -10px; /* Shift left onto edge */
-    width: 22px;
-    height: 22px;
+    top: -6px;    /* Reduced from -10px */
+    left: -6px;   /* Reduced from -10px */
+    width: 14px;  /* Reduced from 16px */
+    height: 14px; /* Reduced from 16px */
     background-color: var(--delete-red);
     color: white;
-    border: 2px solid white; /* Black border */
-    border-radius: 50%; /* Circle */
+    border: 1px solid black;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 22px; /* Smaller font for a smaller button */
     font-weight: bold;
     cursor: pointer;
     z-index: 10;
