@@ -29,7 +29,7 @@ function createPlayerCard(name, courtId = null) {
     
     const btn = document.createElement('button');
     btn.className = 'delete-btn';
-    btn.innerText = '×';
+    btn.innerText = 'x';
     
     if (courtId) {
         btn.onclick = (e) => window.removeSingleFromCourt(e, courtId, div);
@@ -54,8 +54,10 @@ function generateCourts() {
         court.className = 'court';
         court.id = `court-${i}`; 
         court.innerHTML = `
-            <h3>Court ${i}</h3>
-            <div class="slots-container" id="slots-${i}"><span class="free-label">Free</span></div>
+            <h2>Court ${i}</h2>
+            <div class="slots-container" id="slots-${i}">
+            <span class="instruction-text">Click here to add/change players</span></div>
+            <span class="free-label">Free</span><br></div>
             <div class="timer-display" id="timer-${i}">00:00:00</div>
         `;
         
@@ -65,6 +67,9 @@ function generateCourts() {
         
         court.ondragover = (e) => e.preventDefault();
         court.ondrop = (e) => handleDropToCourt(e, i);
+        court.onclick = (e) => { 
+            if (!e.target.closest('.player-card')) handleCourtClick(i); 
+        };
         grid.appendChild(court);
     }
 }
@@ -74,7 +79,7 @@ function updateCourtDisplay(courtId, playerArray) {
     container.innerHTML = '';
     
     if (playerArray.length === 0) {
-        container.innerHTML = '<span class="free-label">Free</span>';
+        container.innerHTML = '<span class="free-label">Free</span><div class="instruction-text">Click here to add/change players</div>';
         stopTimer(courtId);
     } else {
         playerArray.forEach((p, index) => {
@@ -262,22 +267,40 @@ function renderDatabase() {
     });
 }
 
+// Ensure timers stores the interval ID AND the seconds count for each court
+
 function startTimer(courtId) {
-    if (timers[courtId]) return;
-    let sec = 0;
-    timers[courtId] = setInterval(() => {
-        sec++;
+    // 1. If a timer is already running for this court, kill it first
+    if (timers[courtId]) {
+        clearInterval(timers[courtId].interval);
+    }
+
+    // 2. Initialize or reset the court's data
+    timers[courtId] = {
+        seconds: 0,
+        interval: null
+    };
+
+    const el = document.getElementById(`timer-${courtId}`);
+    
+    // 3. Start a fresh interval
+    timers[courtId].interval = setInterval(() => {
+        timers[courtId].seconds++;
+        
+        let sec = timers[courtId].seconds;
         const h = String(Math.floor(sec / 3600)).padStart(2, '0');
         const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
         const s = String(sec % 60).padStart(2, '0');
-        const el = document.getElementById(`timer-${courtId}`);
+        
         if (el) el.innerText = `${h}:${m}:${s}`;
     }, 1000);
 }
 
 function stopTimer(courtId) {
-    clearInterval(timers[courtId]);
-    delete timers[courtId];
+    if (timers[courtId]) {
+        clearInterval(timers[courtId].interval);
+        delete timers[courtId];
+    }
     const el = document.getElementById(`timer-${courtId}`);
     if (el) el.innerText = "00:00:00";
 }
