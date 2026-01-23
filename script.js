@@ -225,41 +225,23 @@ window.removeSingleFromCourt = (e, courtId, element) => {
     renderDatabase();
 };
 
-function handleCourtClick(courtId) {
-    const container = document.getElementById(`slots-${courtId}`);
-    const currentCards = container.querySelectorAll('.player-card');
-    
-    // Clear any previous focus highlights
-    document.querySelectorAll('.court').forEach(c => c.classList.remove('focused'));
+function renderQueue() {
+    const container = document.getElementById('playerQueue');
+    container.innerHTML = '';
+    container.ondragover = (e) => e.preventDefault();
+    container.ondrop = (e) => handleDropToQueue(e);
 
-    if (currentCards.length > 0) {
-        // --- SWAP LOGIC ---
-        // Move current players back to the end of the queue
-        currentCards.forEach(card => {
-            const name = card.getAttribute('data-name');
-            if (name) queue.push({ name: name, id: Date.now() + Math.random() });
-        });
-
-        // Fill immediately with the next players from the queue
-        const nextPlayers = queue.splice(0, config.playersPerCourt);
-        updateCourtDisplay(courtId, nextPlayers);
-        renderQueue();
-    } else {
-        // --- AUTO-FILL LOGIC ---
-        if (queue.length >= 1) {
-            // Grab up to the 'playersPerCourt' amount (usually 2)
-            const nextPlayers = queue.splice(0, config.playersPerCourt);
-            updateCourtDisplay(courtId, nextPlayers);
-            renderQueue();
-        } else {
-            // Nothing in queue? Fall back to focus mode so you can add someone manually
-            focusedCourtId = courtId;
-            document.getElementById(`court-${courtId}`).classList.add('focused');
-        }
-    }
-    
-    // Refresh the player pool display to update 'active-in-system' status
-    renderDatabase();
+    queue.forEach((player, index) => {
+        const div = createPlayerCard(player.name);
+        div.onclick = () => handleSidebarPlayerClick(index);
+        
+        div.querySelector('.delete-btn').onclick = (e) => {
+            e.stopPropagation();
+            removeFromQueue(e, index);
+        };
+        div.ondragstart = (e) => e.dataTransfer.setData("queueIndex", index);
+        container.appendChild(div);
+    });
 }
 
 // --- Modals, Database, Timers ---
