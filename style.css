@@ -16,12 +16,10 @@ html, body {
     overflow: hidden;
     font-family: -apple-system, system-ui, sans-serif;
     background-color: var(--primary-bg);
-    background-size: cover;
+    background-size: 25%;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    background-size: 25%;
-
 }
 
 body {
@@ -33,7 +31,7 @@ body {
 header, #settings, main {
     width: 95%;
     max-width: 1400px;
-    margin: 0 auto; /* Centers everything */
+    margin: 0 auto;
     box-sizing: border-box;
 }
 
@@ -91,7 +89,7 @@ main {
     padding: 15px;
     height: 100%;
     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    min-height: 580px; /* Important for inner scroll */
+    min-height: 580px;
     box-sizing: border-box;
 }
 
@@ -114,7 +112,7 @@ main {
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
-    gap: 15px; /* Space for the offset delete buttons */
+    gap: 15px;
 }
 
 /* 5. Right Courts Area */
@@ -126,8 +124,8 @@ main {
     height: 580px;
     overflow-y: auto; 
     padding-bottom: 20px;
-    scrollbar-width:auto;
-    padding-right: 5px; /* Prevents cutting off last court */
+    scrollbar-width: auto;
+    padding-right: 5px;
 }
 
 .court {
@@ -142,11 +140,18 @@ main {
     flex-direction: column;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     box-sizing: border-box;
+    transition: background-color 0.2s;
+}
+
+/* DRAG OVER STATE FOR IPHONE VISUAL FEEDBACK */
+.court-drag-over {
+    background-color: rgba(46, 204, 113, 0.1) !important;
+    border: 2px dashed var(--free-green) !important;
 }
 
 /* 6. Player Cards & Circle Delete Button */
 .player-card {
-    position: relative; /* Anchor for the absolute X button */
+    position: relative;
     background: #fff;
     border: 1px solid #ddd;
     padding: 12px 10px 12px 25px;
@@ -156,9 +161,30 @@ main {
     cursor: grab;
     width: fit-content;
     min-width: 90px;
+    
+    /* MOBILE DRAG FIXES */
+    touch-action: none !important;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
 }
 
-/* The Greyed-out state */
+/* THE FLOATING CARD DURING DRAG */
+.drag-ghost {
+    position: fixed !important;
+    pointer-events: none !important;
+    z-index: 9999 !important;
+    opacity: 0.8;
+    transform: scale(1.1);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    background: white !important;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px 10px 12px 25px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
 .player-card.active-in-system {
     background-color: #e2e8f0;
     color: #94a3b8;
@@ -169,10 +195,10 @@ main {
 
 .delete-btn {
     position: absolute;
-    top: -6px;    /* Reduced from -10px */
-    left: -6px;   /* Reduced from -10px */
-    width: 14px;  /* Reduced from 16px */
-    height: 14px; /* Reduced from 16px */
+    top: -6px;
+    left: -6px;
+    width: 14px;
+    height: 14px;
     background-color: var(--delete-red);
     color: white;
     border: 1px solid black;
@@ -180,7 +206,7 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px; /* Smaller font for a smaller button */
+    font-size: 22px;
     font-weight: bold;
     cursor: pointer;
     z-index: 10;
@@ -217,10 +243,9 @@ main {
     flex-direction: column;
 }
 
-/* The area where players are listed */
 #playerDatabase {
-    flex-grow: 1;    /* Takes up all available space in the modal */
-    overflow-y: auto; /* Adds the scrollbar when names overflow */
+    flex-grow: 1;
+    overflow-y: auto;
     border: 1px solid #eee;
     padding: 10px;
     margin-top: 10px;
@@ -263,13 +288,13 @@ main {
     margin: auto;
 }
 
-    .instruction-text {
+.instruction-text {
     font-size: 1rem;
     color: #666;
-    margin:auto;
+    margin: auto;
     text-align: center;
     font-style: italic;
-    pointer-events: none; /* This ensures the click goes through to the court */
+    pointer-events: none;
 }
 
 .timer-display {
@@ -282,17 +307,16 @@ main {
     font-size: 1.2rem;
     margin-top: auto;
 }
-/* Container inside the court that holds players */
+
 .slots-container {
     flex: 1;
     display: flex;
-    flex-direction: column; /* Stack players vertically */
-    align-items: center;    /* Center players horizontally */
-    justify-content: center; /* Center the whole group vertically */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 10px;
 }
 
-/* The VS label between players */
 .vs-text {
     font-weight: 800;
     color: #718096;
@@ -302,15 +326,13 @@ main {
     letter-spacing: 1px;
 }
 
-/* Ensure cards don't stretch to full width inside the court */
 .court .player-card {
     margin: 0; 
-    width: 180px; /* Fixed width for consistency on court */
+    width: 180px;
     text-align: center;
-    padding-left: 10px; /* Resetting padding since we want it centered */
+    padding-left: 10px;
 }
 
-/* Adjust delete button for centered cards */
 .court .delete-btn {
     left: -8px; 
 }
@@ -330,33 +352,26 @@ main {
     background-color: #218838;
 }
 
-
-
-/* --- EXISTING DESKTOP STYLES ABOVE --- */
-
 /* --- Tablet & Phone Specific (Screens under 1024px) --- */
 @media (max-width: 1024px) {
-    /* Reset Global Widths for mobile */
     header, #settings, .app-container {
         width: 100% !important;
         margin: 0;
         border-radius: 0;
     }
 
-    /* 1. Force the Split-Screen */
     .app-container {
         display: flex !important;
         flex-direction: row !important;
-        height: calc(100vh - 120px); /* Subtracts header/settings height */
+        height: calc(100vh - 120px);
         width: 100vw;
         overflow: hidden;
         padding: 0 !important;
         gap: 5px;
     }
 
-    /* 2. Left Sidebar (The Queue) */
     #sidePanel {
-        width: 180px; /* Wider for thumbs */
+        width: 180px;
         height: 95% !important;
         overflow-y: auto;
         background-color: #f8f9fa;
@@ -366,77 +381,41 @@ main {
     }
     
     .column {
-        min-height: auto !important; /* Remove the fixed 580px height from desktop */
+        min-height: auto !important;
         height: 100%;
         padding: 5px;
     }
 
-    /* 3. Right Side (The Court Grid) */
     #courtGrid {
         flex-grow: 1;
         height: 100%;
         overflow-y: auto;
-        display: block !important; /* Stack courts vertically */
+        display: block !important;
         padding: 5px;
         gap: 8px;
         scroll-snap-type: y mandatory;
     }
 
-    /* 4. Two-Court View Logic */
     .court {
-        width: 100% !important; /* Full width of the right column */
-        height: 42vh !important; /* Fits two on screen */
+        width: 100% !important;
+        height: 42vh !important;
         margin-bottom: 8px;
         padding: 10px;
         scroll-snap-align: start;
         border: 4px solid #ccc;
     }
 
-    .court .player-card {
-        width: 100px !important; /* Even smaller for mobile views */
-        padding: 10px 10px 10px 25px !important;
-    }
-
-    /* 5. The Selection Glow */
     .court.focused {
         border-color: #007bff !important;
         box-shadow: 0 0 15px rgba(0, 123, 255, 0.5);
         background-color: #f0f7ff;
     }
 
-    /* Target larger cards for thumbs */
-    /* Update your Player Card section */
-.player-card {
-    position: relative;
-    background: #fff;
-    border: 1px solid #ddd;
-    padding: 12px 10px 12px 25px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: grab;
-    width: fit-content;
-    min-width: 90px;
-    
-    /* CRITICAL FOR IPHONE DRAGGING */
-    touch-action: none !important; 
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-touch-callout: none; /* Prevents the "save image" popup on long press */
-}
-
-/* Added: visual feedback when dragging over a court */
-.court-drag-over {
-    background-color: rgba(46, 204, 113, 0.15) !important;
-    border: 2px dashed var(--free-green) !important;
-}
-
-/* Style for the player while being dragged */
-.player-card:active {
-    cursor: grabbing;
-    opacity: 0.7;
-    transform: scale(1.05);
-}
+    .player-card {
+        width: 90% !important;
+        font-size: 1.1rem;
+        padding: 15px 10px 15px 30px !important;
+    }
 
     .delete-btn {
         width: 32px !important;
@@ -445,41 +424,37 @@ main {
     }
 }
 
-
-
+/* --- Modal Pool Styling --- */
 .pool-modal-content {
-        width: 90% !important;   /* Use most of the screen width */
-        max-width: none;         /* Remove desktop limits */
-        height: 85vh !important; /* Keep it from going off-screen */
-        margin: 5vh auto;        /* Center it vertically */
-        padding: 15px;
-    }
+    width: 90% !important;
+    max-width: none;
+    height: 85vh !important;
+    margin: 5vh auto;
+    padding: 15px;
+}
 
-    /* 2. Ensure the player list scrolls properly */
-    #playerDatabase {
-        flex: 1;                /* Grow to fill the modal */
-        overflow-y: auto;       /* Scroll names if there are many */
-        display: grid;
-        grid-template-columns: 1fr 1fr; /* Two columns of names for easier tapping */
-        gap: 10px;
-        padding: 10px;
-    }
+#playerDatabase {
+    flex: 1;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 10px;
+}
 
-    /* 3. Make the individual player buttons easier to tap with thumbs */
-    #playerDatabase .player-card {
-        width: 100% !important;
-        box-sizing: border-box;
-        margin: 0;
-        padding: 15px 10px 15px 35px !important; /* Extra room for the X button */
-    }
+#playerDatabase .player-card {
+    width: 100% !important;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 15px 10px 15px 35px !important;
+}
 
-    /* 4. Fix the "Add All" and "Done" buttons */
-    .add-all-btn, .close-pool-btn {
-        width: 100%;
-        padding: 15px;
-        font-size: 1.1rem;
-        margin: 10px 0;
-    }
+.add-all-btn, .close-pool-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.1rem;
+    margin: 10px 0;
+}
 
 
 
