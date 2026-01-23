@@ -13,7 +13,8 @@ html, body {
     width: 100vw;
     margin: 0;
     padding: 0;
-    overflow-y: auto;
+    overflow: hidden; /* Re-lock the main page */
+    position: fixed;  /* Prevents "rubber-banding" on iPhone */
     font-family: -apple-system, system-ui, sans-serif;
     background-color: var(--primary-bg);
     background-size: 25%;
@@ -29,7 +30,7 @@ body {
 
 /* 2. Centered Containers (80% Width) */
 header, #settings, main {
-    width: 95%;
+    width: 50%;
     max-width: 1400px;
     margin: 0 auto;
     box-sizing: border-box;
@@ -71,9 +72,9 @@ main {
     margin: 0 auto;
     gap: 20px;
     padding: 20px 0;
-    height: auto;
+    height: calc(100vh - 150px); /* Adjust based on your header height */
+    overflow: hidden;
     align-items: start;
-    overflow: hidden; 
 }
 
 /* 4. Sidebar: 100% Waiting Queue */
@@ -122,12 +123,10 @@ main {
     grid-auto-rows: min-content !important;
     gap: 20px;
     justify-content: center;
-    height: auto;
-    max-height: none;
-    overflow:visible; 
-    padding-bottom: 20px;
+    height: 100%;
+    overflow-y: auto; 
+    padding-right: 10px;
     scrollbar-width: auto;
-    padding-right: 5px;
 }
 
 .court {
@@ -199,6 +198,7 @@ main {
     cursor: not-allowed;
     opacity: 0.7;
 }
+
 
 .delete-btn {
     position: absolute;
@@ -370,10 +370,10 @@ main {
     .app-container {
         display: flex !important;
         flex-direction: row !important;
-        height: auto !important; /* Allow the container to grow */
+        height: calc(100vh - 120px) !important; /* Adjust based on your header height */
         min-height: 100vh; 
         width: 100vw;
-        overflow: visible !important; /* Allow content to flow down */
+        overflow: hidden !important; /* Allow content to flow down */
         padding: 0 !important;
         gap: 5px;
     }
@@ -396,20 +396,22 @@ main {
 
     #courtGrid {
         flex-grow: 1;
-        height: auto !important; /* Let the grid grow */
-        display: flex !important; /* Flex is often more reliable for growing columns on mobile */
-        flex-direction: column;
-        padding: 5px;
+        height: 100% !important; 
+        overflow-y: auto !important; /* Only this area scrolls! */
+        display: block !important; 
+        -webkit-overflow-scrolling: touch; /* Makes scrolling smooth on iPhone */
+        padding: 10px;
         gap: 15px;
     }
 
    .court {
         width: 100% !important;
         height: auto !important; /* THE FIX: Change from 42vh to auto */
-        min-height: 300px;      /* Keeps it looking like a court when empty */
-        margin-bottom: 15px;
-        padding: 15px;
+        min-height: 280px;      /* Keeps it looking like a court when empty */
+        margin-bottom: 20px;
+        padding: 20px 15px !important;
         overflow: visible !important;
+       
     }
 
     .court.focused {
@@ -426,7 +428,9 @@ main {
 
     /* Add this inside your @media (max-width: 1024px) block */
     .court .player-card {
-        width: 110px !important; 
+        width: 80% !important; 
+        max-width: 220px;
+        margin: 0 auto !important;
         padding: 8px 5px 8px 20px !important;
     }
 
