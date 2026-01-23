@@ -367,6 +367,7 @@ main {
         border-radius: 0;
     }
 
+
     .app-container {
         display: flex !important;
         flex-direction: row !important;
@@ -388,6 +389,45 @@ main {
         padding: 10px;
     }
     
+/* 1. Stack the header and button */
+#sidePanel .header-with-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+/* 2. Move the text to the bottom and the button to the top */
+#sidePanel .header-with-action h2 {
+    order: 2; /* Moves text second */
+    font-size: 1.4 !important;
+    text-align: center;
+    margin: 0;
+    color: #4a5568;
+}
+
+#sidePanel .plus-btn {
+    order: 1; /* Moves button first */
+    width: 100% !important;
+    height: 48px !important;
+    border-radius: 8px !important;
+    font-size: 1.4rem !important;
+    font-weight: bold;
+    background-color: var(--accent-color) !important; /* Professional dark blue */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    color: white;
+}
+
+/* 3. Add the label to the button */
+#sidePanel .plus-btn::after {
+    content: "Add Player";
+    margin-left: 8px;
+}
+
     .column {
         min-height: auto !important;
         height: 100%;
