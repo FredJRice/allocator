@@ -417,6 +417,12 @@ main {
         padding: 15px 10px 15px 30px !important;
     }
 
+    /* Add this inside your @media (max-width: 1024px) block */
+    .court .player-card {
+        width: 110px !important; 
+        padding: 8px 5px 8px 20px !important;
+    }
+
     .delete-btn {
         width: 32px !important;
         height: 32px !important;
