@@ -6,7 +6,7 @@ let queue = [];
 let timers = {};
 let config = { count: 4, playersPerCourt: 2 };
 let focusedCourtId = null;
-let draggedPlayerIndex = null; // Bridge for iPhone touch-dragging
+let activeGhost = null; // For the sliding drag effect on mobile
 
 document.addEventListener('DOMContentLoaded', () => {
     generateCourts();
@@ -34,7 +34,6 @@ function createPlayerCard(name, courtId = null) {
     btn.innerText = '×';
     
     if (courtId) {
-        // If on a court, clicking 'x' removes them back to queue
         btn.onclick = (e) => window.removeSingleFromCourt(e, courtId, div);
         div.ondragstart = (e) => {
             e.dataTransfer.setData("playerName", name);
@@ -69,14 +68,12 @@ function generateCourts() {
             <div class="timer-display" id="timer-${i}">00:00:00</div>
         `;
         
-        // Single Click Logic: Auto-fill or Swap
         court.onclick = (e) => { 
             if (!e.target.closest('.player-card') && !e.target.closest('.delete-btn')) {
                 handleCourtClick(i); 
             }
         };
         
-        // Drag and Drop Listeners
         court.ondragover = (e) => e.preventDefault();
         court.ondrop = (e) => handleDropToCourt(e, i);
         
@@ -119,21 +116,17 @@ function handleCourtClick(courtId) {
     document.querySelectorAll('.court').forEach(c => c.classList.remove('focused'));
 
     if (currentCards.length > 0) {
-        // SWAP: Current players to back of queue, fill with new ones
         currentCards.forEach(card => {
             const name = card.getAttribute('data-name');
             if (name) queue.push({ name: name, id: Date.now() + Math.random() });
         });
-
         const nextPlayers = queue.splice(0, config.playersPerCourt);
         updateCourtDisplay(courtId, nextPlayers);
     } else {
-        // AUTO-FILL: If empty, grab top players from queue
         if (queue.length >= 1) {
             const nextPlayers = queue.splice(0, config.playersPerCourt);
             updateCourtDisplay(courtId, nextPlayers);
         } else {
-            // Manual Focus fallback
             focusedCourtId = courtId;
             document.getElementById(`court-${courtId}`).classList.add('focused');
         }
@@ -162,32 +155,79 @@ function handleSidebarPlayerClick(index) {
     }
 }
 
-// --- Drag & Drop ---
+// --- Universal Drag & Drop (Desktop + Mobile) ---
 
-function handleDropToCourt(e, courtId) {
-    e.preventDefault();
+function initTouchDrag(e, index, originalElement) {
+    // Only handle primary touch/click
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+
+    // Create a Ghost element to follow the finger
+    activeGhost = originalElement.cloneNode(true);
+    activeGhost.classList.add('drag-ghost');
+    // Ensure styles for the ghost are applied via JS in case CSS isn't loaded
+    activeGhost.style.position = 'fixed';
+    activeGhost.style.pointerEvents = 'none';
+    activeGhost.style.zIndex = '9999';
+    activeGhost.style.opacity = '0.8';
     
-    // Check Desktop DataTransfer first, fall back to Mobile bridge
-    let qIndex = e.dataTransfer.getData("queueIndex");
-    if (qIndex === "" && draggedPlayerIndex !== null) {
-        qIndex = draggedPlayerIndex;
+    document.body.appendChild(activeGhost);
+    
+    const moveAt = (x, y) => {
+        if (!activeGhost) return;
+        activeGhost.style.left = `${x - (activeGhost.offsetWidth / 2)}px`;
+        activeGhost.style.top = `${y - (activeGhost.offsetHeight / 2)}px`;
+        
+        // Highlight courts while dragging over
+        const hoverTarget = document.elementFromPoint(x, y)?.closest('.court');
+        document.querySelectorAll('.court').forEach(c => c.classList.remove('court-drag-over'));
+        if (hoverTarget) hoverTarget.classList.add('court-drag-over');
+    };
+
+    moveAt(e.clientX, e.clientY);
+
+    function onPointerMove(ev) {
+        moveAt(ev.clientX, ev.clientY);
     }
 
-    if (qIndex === "" || qIndex === null) return;
+    function onPointerUp(ev) {
+        const dropTarget = document.elementFromPoint(ev.clientX, ev.clientY)?.closest('.court');
+        
+        if (dropTarget) {
+            const courtId = dropTarget.id.split('-')[1];
+            handleDropToCourt(null, courtId, index); 
+        }
 
-    const container = document.getElementById(`slots-${courtId}`);
-    const currentCards = container.querySelectorAll('.player-card');
-
-    if (currentCards.length >= config.playersPerCourt) {
-        alert("Court is full!");
-        draggedPlayerIndex = null;
-        return;
+        if (activeGhost) activeGhost.remove();
+        activeGhost = null;
+        document.querySelectorAll('.court').forEach(c => c.classList.remove('court-drag-over'));
+        
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
     }
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+}
+
+function handleDropToCourt(e, courtId, manualIndex = null) {
+    if (e) e.preventDefault();
+    
+    let qIndex = (e && e.dataTransfer) ? e.dataTransfer.getData("queueIndex") : manualIndex;
+    
+    if (qIndex === null || qIndex === "") return;
 
     const player = queue.splice(parseInt(qIndex), 1)[0];
-    draggedPlayerIndex = null;
-
     if (player) {
+        const container = document.getElementById(`slots-${courtId}`);
+        const currentCards = container.querySelectorAll('.player-card');
+
+        if (currentCards.length >= config.playersPerCourt) {
+            alert("Court is full!");
+            queue.unshift(player); 
+            renderQueue();
+            return;
+        }
+
         const currentList = Array.from(currentCards).map(c => ({ name: c.getAttribute('data-name') }));
         currentList.push(player);
         updateCourtDisplay(courtId, currentList);
@@ -217,10 +257,9 @@ window.removeSingleFromCourt = (e, courtId, element) => {
     if (!name) return;
 
     queue.push({ name: name, id: Date.now() });
-    
-    const container = document.getElementById(`slots-${courtId}`);
     element.remove();
     
+    const container = document.getElementById(`slots-${courtId}`);
     const remainingCards = container.querySelectorAll('.player-card');
     const remainingData = Array.from(remainingCards).map(c => ({ name: c.getAttribute('data-name') }));
     
@@ -238,17 +277,21 @@ function renderQueue() {
 
     queue.forEach((player, index) => {
         const div = createPlayerCard(player.name);
+        
+        // Tap to select (Sidebar logic)
         div.onclick = () => handleSidebarPlayerClick(index);
         
-        // Delete from queue button
+        // Delete button
         div.querySelector('.delete-btn').onclick = (e) => {
             e.stopPropagation();
             removeFromQueue(e, index);
         };
 
-        // Desktop and Mobile Drag Setup
+        // Desktop Drag
         div.ondragstart = (e) => e.dataTransfer.setData("queueIndex", index);
-        div.ontouchstart = () => { draggedPlayerIndex = index; };
+
+        // Universal Pointer Drag (The Add-on)
+        div.onpointerdown = (e) => initTouchDrag(e, index, div);
 
         container.appendChild(div);
     });
