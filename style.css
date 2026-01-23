@@ -264,23 +264,10 @@ main {
 }
 
 /* Buttons & Labels */
-.plus-btn {
-    background: var(--accent-color);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    font-size: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
 .close-pool-btn {
     padding: 10px 20px;
-    background: var(--accent-color);
+    background: rgb(0,160,224);
     color: white;
     border: none;
     border-radius: 6px;
@@ -288,7 +275,7 @@ main {
 }
 
 .free-label {
-    color: var(--free-green);
+    color: rgb(0,160,224);
     font-weight: bold;
     font-size: 1.5rem;
     text-align: center;
@@ -326,7 +313,7 @@ main {
 
 .vs-text {
     font-weight: 800;
-    color: #718096;
+    color: rgb(39,38,96);
     font-size: 0.9rem;
     margin: 5px 0;
     text-transform: uppercase;
@@ -345,7 +332,7 @@ main {
 }
 
 .add-all-btn {
-    background-color: #28a745;
+    background-color: rgb(0,160,224);
     color: white;
     border: none;
     padding: 10px;
@@ -356,7 +343,29 @@ main {
 }
 
 .add-all-btn:hover {
-    background-color: #218838;
+    background-color: rgb(39,38,96);
+}
+
+/* The big button at the top of the modal */
+.create-player-btn-long {
+    width: 100% !important;
+    height: 50px !important;
+    background-color: rgb(0,160,224);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: block;
+}
+
+/* Centered header text inside modal */
+.pool-header-text {
+    text-align: center;
+    width: 100%;
+    margin: 10px 0;
+    font-size: 1.4rem;
 }
 
 /* --- Tablet & Phone Specific (Screens under 1024px) --- */
@@ -422,11 +431,6 @@ main {
     color: white;
 }
 
-/* 3. Add the label to the button */
-#sidePanel .plus-btn::after {
-    content: "Add Player";
-    margin-left: 8px;
-}
 
     .column {
         min-height: auto !important;

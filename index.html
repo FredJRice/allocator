@@ -12,7 +12,7 @@
     MobileDragDrop.polyfill({
         dragImageTranslateOverride: MobileDragDrop.scrollBehaviourDragImageTranslateOverride
     });
-</script>
+    </script>
 </head>
 <body>
     <header>
@@ -29,11 +29,10 @@
         <aside id="sidePanel" class="sidebar-container">
             <div class="column">
                 <div class="header-with-action">
-                    <h3>Waiting Queue</h3>
-                    <button id="openPoolModalBtn" class="plus-btn">+</button>
+                    <button id="openPoolModalBtn" class="plus-btn">Add Player</button>
+                    <h2>Waiting Queue</h2>
                 </div>
-                <div id="playerQueue" class="queue-container">
-                </div>
+                <div id="playerQueue" class="queue-container"></div>
             </div>
         </aside>
 
@@ -42,20 +41,16 @@
     </main>
 
     <div id="poolModal" class="modal">
-        <div class="modal-content pool-modal-content">
-            <div class="header-with-action">
-                <h3>Select Players from Pool</h3>
-                <button id="openAddPlayerModalBtn" class="plus-btn">+</button>
-            </div>
-            
-            <button onclick="addAllToQueue()" class="add-all-btn">Add All Available to Queue</button>
-            
-            <div id="playerDatabase" class="pool-container modal-pool-grid">
-            </div>
-            
-            <button class="close-pool-btn" onclick="closePool()">Close</button>
-        </div>
+    <div class="modal-content pool-modal-content">
+        <button id="openAddPlayerModalBtn" class="create-player-btn-long">Create New Player</button>
+        <button onclick="addAllToQueue()" class="add-all-btn">Add all to queue</button>
+        <h3 class="pool-header-text">Choose Players below</h3>
+        
+        <div id="playerDatabase" class="pool-container modal-pool-grid"></div>
+        
+        <button class="close-pool-btn" onclick="closePool()">Close</button>
     </div>
+</div>
 
     <div id="addPlayerModal" class="modal">
         <div class="modal-content">
