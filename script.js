@@ -53,13 +53,17 @@ function generateCourts() {
         const court = document.createElement('div');
         court.className = 'court';
         court.id = `court-${i}`; 
-        court.innerHTML = `
-            <h2>Court ${i}</h2>
-            <div class="slots-container" id="slots-${i}">
-            <span class="instruction-text">Click here to add/change players</span></div>
-            <span class="free-label">Free</span><br></div>
-            <div class="timer-display" id="timer-${i}">00:00:00</div>
-        `;
+        // Inside your generateCourts loop
+    court.innerHTML = `
+        <h3>Court ${i}</h3>
+        <div class="slots-container" id="slots-${i}">
+            <div class="status-box">
+                <span class="free-label">Free</span>
+                <div class="instruction-text">Click here to add players</div>
+            </div>
+        </div>
+        <div class="timer-display" id="timer-${i}">00:00:00</div>
+    `;
         
         court.onclick = (e) => { 
             if (!e.target.closest('.player-card')) handleCourtClick(i); 
@@ -76,12 +80,22 @@ function generateCourts() {
 
 function updateCourtDisplay(courtId, playerArray) {
     const container = document.getElementById(`slots-${courtId}`);
+    if (!container) return;
+    
+    // This clears EVERYTHING inside the slots div (labels, text, cards)
     container.innerHTML = '';
     
-    if (playerArray.length === 0) {
-        container.innerHTML = '<span class="free-label">Free</span><div class="instruction-text">Click here to add/change players</div>';
+    if (!playerArray || playerArray.length === 0) {
+        // Only put the labels back if the court is empty
+        container.innerHTML = `
+            <div class="status-box">
+                <span class="free-label">Free</span>
+                <div class="instruction-text">Click here to add players</div>
+            </div>
+        `;
         stopTimer(courtId);
     } else {
+        // Logic for adding player cards...
         playerArray.forEach((p, index) => {
             if (index > 0) {
                 const vs = document.createElement('div');
@@ -99,27 +113,37 @@ function handleCourtClick(courtId) {
     const container = document.getElementById(`slots-${courtId}`);
     const currentCards = container.querySelectorAll('.player-card');
     
-    // Clear previous focus highlight
+    // Clear any previous focus highlights
     document.querySelectorAll('.court').forEach(c => c.classList.remove('focused'));
 
     if (currentCards.length > 0) {
-        // SWAP LOGIC: Move court players to end of queue
+        // --- SWAP LOGIC ---
+        // Move current players back to the end of the queue
         currentCards.forEach(card => {
             const name = card.getAttribute('data-name');
-            if (name) queue.push({ name: name, id: Date.now() });
+            if (name) queue.push({ name: name, id: Date.now() + Math.random() });
         });
 
-        focusedCourtId = null;
-
-        // Fill with next players
+        // Fill immediately with the next players from the queue
         const nextPlayers = queue.splice(0, config.playersPerCourt);
         updateCourtDisplay(courtId, nextPlayers);
         renderQueue();
     } else {
-        // FOCUS LOGIC: For manual tapping
-        focusedCourtId = courtId;
-        document.getElementById(`court-${courtId}`).classList.add('focused');
+        // --- AUTO-FILL LOGIC ---
+        if (queue.length >= 1) {
+            // Grab up to the 'playersPerCourt' amount (usually 2)
+            const nextPlayers = queue.splice(0, config.playersPerCourt);
+            updateCourtDisplay(courtId, nextPlayers);
+            renderQueue();
+        } else {
+            // Nothing in queue? Fall back to focus mode so you can add someone manually
+            focusedCourtId = courtId;
+            document.getElementById(`court-${courtId}`).classList.add('focused');
+        }
     }
+    
+    // Refresh the player pool display to update 'active-in-system' status
+    renderDatabase();
 }
 
 function handleSidebarPlayerClick(index) {

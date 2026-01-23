@@ -266,7 +266,7 @@ main {
     .instruction-text {
     font-size: 1rem;
     color: #666;
-    margin:auto
+    margin:auto;
     text-align: center;
     font-style: italic;
     pointer-events: none; /* This ensures the click goes through to the court */
@@ -329,6 +329,8 @@ main {
 .add-all-btn:hover {
     background-color: #218838;
 }
+
+
 
 /* --- EXISTING DESKTOP STYLES ABOVE --- */
 
@@ -415,6 +417,8 @@ main {
         left: -12px !important;
     }
 }
+
+
 
 .pool-modal-content {
         width: 90% !important;   /* Use most of the screen width */
