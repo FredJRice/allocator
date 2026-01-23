@@ -13,7 +13,7 @@ html, body {
     width: 100vw;
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    overflow-y: auto;
     font-family: -apple-system, system-ui, sans-serif;
     background-color: var(--primary-bg);
     background-size: 25%;
@@ -119,10 +119,12 @@ main {
 .court-grid {
     display: grid;
     grid-template-columns: repeat(2, 280px); 
+    grid-auto-rows: min-content !important;
     gap: 20px;
     justify-content: center;
-    height: 580px;
-    overflow-y: auto; 
+    height: auto;
+    max-height: none;
+    overflow:visible; 
     padding-bottom: 20px;
     scrollbar-width: auto;
     padding-right: 5px;
@@ -134,14 +136,19 @@ main {
     border-radius: 12px;
     padding: 15px;
     width: 280px;
-    height: 280px;
+    height:auto;
+    min-height: 280px;
     display: flex;
     text-align: center;
     flex-direction: column;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     box-sizing: border-box;
+    overflow: visible;
     transition: background-color 0.2s;
 }
+
+/* 2. Ensure the container for players doesn't restrict height */
+
 
 /* DRAG OVER STATE FOR IPHONE VISUAL FEEDBACK */
 .court-drag-over {
@@ -363,9 +370,10 @@ main {
     .app-container {
         display: flex !important;
         flex-direction: row !important;
-        height: calc(100vh - 120px);
+        height: auto !important; /* Allow the container to grow */
+        min-height: 100vh; 
         width: 100vw;
-        overflow: hidden;
+        overflow: visible !important; /* Allow content to flow down */
         padding: 0 !important;
         gap: 5px;
     }
@@ -388,21 +396,20 @@ main {
 
     #courtGrid {
         flex-grow: 1;
-        height: 100%;
-        overflow-y: auto;
-        display: block !important;
+        height: auto !important; /* Let the grid grow */
+        display: flex !important; /* Flex is often more reliable for growing columns on mobile */
+        flex-direction: column;
         padding: 5px;
-        gap: 8px;
-        scroll-snap-type: y mandatory;
+        gap: 15px;
     }
 
-    .court {
+   .court {
         width: 100% !important;
-        height: 42vh !important;
-        margin-bottom: 8px;
-        padding: 10px;
-        scroll-snap-align: start;
-        border: 4px solid #ccc;
+        height: auto !important; /* THE FIX: Change from 42vh to auto */
+        min-height: 300px;      /* Keeps it looking like a court when empty */
+        margin-bottom: 15px;
+        padding: 15px;
+        overflow: visible !important;
     }
 
     .court.focused {
@@ -462,5 +469,13 @@ main {
     margin: 10px 0;
 }
 
-
-
+.slots-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: auto !important;
+    margin-bottom: 20px;
+}
