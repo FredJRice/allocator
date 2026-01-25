@@ -4,7 +4,7 @@
 let players = JSON.parse(localStorage.getItem('racquetPlayers')) || [];
 let queue = [];
 let timers = {};
-let config = { count: 4, playersPerCourt: 2 };
+let config = { count: 4};
 let focusedCourtId = null;
 let activeGhost = null; // For the sliding drag effect on mobile
 
@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('applySettings').addEventListener('click', () => {
         config.count = parseInt(document.getElementById('courtCount').value) || 4;
-        config.playersPerCourt = parseInt(document.getElementById('playersPerCourt').value) || 2;
         Object.keys(timers).forEach(id => stopTimer(id));
         generateCourts();
     });
@@ -115,18 +114,21 @@ function handleCourtClick(courtId) {
     
     document.querySelectorAll('.court').forEach(c => c.classList.remove('focused'));
 
+    // If court has players, clear them back to queue and refill with exactly 2
     if (currentCards.length > 0) {
         currentCards.forEach(card => {
             const name = card.getAttribute('data-name');
             if (name) queue.push({ name: name, id: Date.now() + Math.random() });
         });
-        const nextPlayers = queue.splice(0, config.playersPerCourt);
+        const nextPlayers = queue.splice(0, 2); // Hardcoded to 2
         updateCourtDisplay(courtId, nextPlayers);
     } else {
-        if (queue.length >= 1) {
-            const nextPlayers = queue.splice(0, config.playersPerCourt);
+        // If court is empty, try to grab 2 players
+        if (queue.length >= 2) {
+            const nextPlayers = queue.splice(0, 2); // Hardcoded to 2
             updateCourtDisplay(courtId, nextPlayers);
         } else {
+            // Not enough players for a match, just focus it for manual adding
             focusedCourtId = courtId;
             document.getElementById(`court-${courtId}`).classList.add('focused');
         }
@@ -140,7 +142,8 @@ function handleSidebarPlayerClick(index) {
         const container = document.getElementById(`slots-${focusedCourtId}`);
         const currentCards = container.querySelectorAll('.player-card');
 
-        if (currentCards.length < config.playersPerCourt) {
+        // Allow manual adding up to 4 players
+        if (currentCards.length < 4) {
             const player = queue.splice(index, 1)[0];
             const currentList = Array.from(currentCards).map(c => ({ name: c.getAttribute('data-name') }));
             currentList.push(player);
@@ -149,6 +152,7 @@ function handleSidebarPlayerClick(index) {
             renderQueue();
             renderDatabase();
         } else {
+            // Court is full (4 players), remove focus
             focusedCourtId = null;
             document.querySelectorAll('.court').forEach(c => c.classList.remove('focused'));
         }
@@ -221,8 +225,9 @@ function handleDropToCourt(e, courtId, manualIndex = null) {
         const container = document.getElementById(`slots-${courtId}`);
         const currentCards = container.querySelectorAll('.player-card');
 
-        if (currentCards.length >= config.playersPerCourt) {
-            alert("Court is full!");
+        // Hard limit of 4 players for drag and drop
+        if (currentCards.length >= 4) {
+            alert("Maximum 4 players per court.");
             queue.unshift(player); 
             renderQueue();
             return;

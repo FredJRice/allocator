@@ -1,3 +1,6 @@
+/* ==========================================
+   1. VARIABLES & ROOT
+   ========================================== */
 :root {
     --primary-bg: #f0f2f5;
     --court-bg: #ffffff;
@@ -7,14 +10,16 @@
     --timer-bg: #333333;
 }
 
-/* 1. Global Reset & Body */
+/* ==========================================
+   2. GLOBAL RESET & BODY
+   ========================================== */
 html, body {
     height: 100%;
     width: 100vw;
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Re-lock the main page */
-    position: fixed;  /* Prevents "rubber-banding" on iPhone */
+    overflow: hidden; 
+    position: fixed;  
     font-family: -apple-system, system-ui, sans-serif;
     background-color: var(--primary-bg);
     background-size: 25%;
@@ -28,8 +33,10 @@ body {
     flex-direction: column;
 }
 
-/* 2. Centered Containers (80% Width) */
-header, #settings, main {
+/* ==========================================
+   3. HEADER & SETTINGS
+   ========================================== */
+header, #settings {
     width: 50%;
     max-width: 1400px;
     margin: 0 auto;
@@ -37,10 +44,10 @@ header, #settings, main {
 }
 
 header {
-    background: white;
+    background: linear-gradient(180deg, rgb(0, 160, 224) 60%, rgb(38, 39, 96) 100%);
     text-align: center;
-    margin-top: 20px;
-    padding: 15px;
+    margin-top: 5px;
+    padding: 8px;
     border-bottom: 1px solid #ddd;
     flex-shrink: 0;
     border-radius: 8px 8px 0 0;
@@ -63,7 +70,9 @@ header {
     padding: 5px;
 }
 
-/* 3. Main Content Area (Sidebar | Courts) */
+/* ==========================================
+   4. MAIN LAYOUT & SIDEBAR (QUEUE)
+   ========================================== */
 main {
     display: grid;
     grid-template-columns: 340px 1fr; 
@@ -72,12 +81,11 @@ main {
     margin: 0 auto;
     gap: 20px;
     padding: 20px 0;
-    height: calc(100vh - 150px); /* Adjust based on your header height */
+    height: calc(100vh - 150px);
     overflow: hidden;
     align-items: start;
 }
 
-/* 4. Sidebar: 100% Waiting Queue */
 #sidePanel {
     height: 580px;
 }
@@ -116,7 +124,9 @@ main {
     gap: 15px;
 }
 
-/* 5. Right Courts Area */
+/* ==========================================
+   5. COURT GRID & COURT CARDS
+   ========================================== */
 .court-grid {
     display: grid;
     grid-template-columns: repeat(2, 280px); 
@@ -135,7 +145,7 @@ main {
     border-radius: 12px;
     padding: 15px;
     width: 280px;
-    height:auto;
+    height: auto;
     min-height: 280px;
     display: flex;
     text-align: center;
@@ -146,16 +156,43 @@ main {
     transition: background-color 0.2s;
 }
 
-/* 2. Ensure the container for players doesn't restrict height */
-
-
-/* DRAG OVER STATE FOR IPHONE VISUAL FEEDBACK */
 .court-drag-over {
     background-color: rgba(46, 204, 113, 0.1) !important;
     border: 2px dashed var(--free-green) !important;
 }
 
-/* 6. Player Cards & Circle Delete Button */
+.timer-display {
+    background: var(--timer-bg);
+    color: white;
+    text-align: center;
+    padding: 5px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 1.2rem;
+    margin-top: auto;
+}
+
+.slots-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.vs-text {
+    font-weight: 800;
+    color: rgb(39, 38, 96);
+    font-size: 0.9rem;
+    margin: 5px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ==========================================
+   6. PLAYER CARDS & BUTTONS
+   ========================================== */
 .player-card {
     position: relative;
     background: #fff;
@@ -167,15 +204,27 @@ main {
     cursor: grab;
     width: fit-content;
     min-width: 90px;
-    
-    /* MOBILE DRAG FIXES */
     touch-action: none !important;
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
 }
 
-/* THE FLOATING CARD DURING DRAG */
+.player-card.active-in-system {
+    background-color: #e2e8f0;
+    color: #94a3b8;
+    border-color: #cbd5e0;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.court .player-card {
+    margin: 0; 
+    width: 180px;
+    text-align: center;
+    padding-left: 10px;
+}
+
 .drag-ghost {
     position: fixed !important;
     pointer-events: none !important;
@@ -191,14 +240,15 @@ main {
     font-weight: 600;
 }
 
-.player-card.active-in-system {
-    background-color: #e2e8f0;
-    color: #94a3b8;
-    border-color: #cbd5e0;
-    cursor: not-allowed;
-    opacity: 0.7;
+.plus-btn {
+    background-color: rgb(0, 160, 224);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
 }
-
 
 .delete-btn {
     position: absolute;
@@ -220,7 +270,13 @@ main {
     line-height: 1;
 }
 
-/* 7. Modal Styling */
+.court .delete-btn {
+    left: -8px; 
+}
+
+/* ==========================================
+   7. MODAL STYLING
+   ========================================== */
 .modal {
     display: none; 
     position: fixed;
@@ -250,6 +306,13 @@ main {
     flex-direction: column;
 }
 
+.pool-header-text {
+    text-align: center;
+    width: 100%;
+    margin: 10px 0;
+    font-size: 1.4rem;
+}
+
 #playerDatabase {
     flex-grow: 1;
     overflow-y: auto;
@@ -258,16 +321,33 @@ main {
     margin-top: 10px;
 }
 
-.modal-pool-grid {
-    flex-grow: 1;
-    margin: 15px 0;
+.create-player-btn-long {
+    width: 100% !important;
+    height: 50px !important;
+    background-color: rgb(0, 160, 224);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: block;
 }
 
-/* Buttons & Labels */
+.add-all-btn {
+    background-color: rgb(0, 160, 224);
+    color: white;
+    border: none;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
 
 .close-pool-btn {
     padding: 10px 20px;
-    background: rgb(0,160,224);
+    background: rgb(0, 160, 224);
     color: white;
     border: none;
     border-radius: 6px;
@@ -275,7 +355,7 @@ main {
 }
 
 .free-label {
-    color: rgb(0,160,224);
+    color: rgb(0, 160, 224);
     font-weight: bold;
     font-size: 1.5rem;
     text-align: center;
@@ -291,84 +371,9 @@ main {
     pointer-events: none;
 }
 
-.timer-display {
-    background: var(--timer-bg);
-    color: white;
-    text-align: center;
-    padding: 5px;
-    border-radius: 4px;
-    font-family: monospace;
-    font-size: 1.2rem;
-    margin-top: auto;
-}
-
-.slots-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
-
-.vs-text {
-    font-weight: 800;
-    color: rgb(39,38,96);
-    font-size: 0.9rem;
-    margin: 5px 0;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.court .player-card {
-    margin: 0; 
-    width: 180px;
-    text-align: center;
-    padding-left: 10px;
-}
-
-.court .delete-btn {
-    left: -8px; 
-}
-
-.add-all-btn {
-    background-color: rgb(0,160,224);
-    color: white;
-    border: none;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.add-all-btn:hover {
-    background-color: rgb(39,38,96);
-}
-
-/* The big button at the top of the modal */
-.create-player-btn-long {
-    width: 100% !important;
-    height: 50px !important;
-    background-color: rgb(0,160,224);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-    display: block;
-}
-
-/* Centered header text inside modal */
-.pool-header-text {
-    text-align: center;
-    width: 100%;
-    margin: 10px 0;
-    font-size: 1.4rem;
-}
-
-/* --- Tablet & Phone Specific (Screens under 1024px) --- */
+/* ==========================================
+   8. MEDIA QUERIES (TABLET & MOBILE)
+   ========================================== */
 @media (max-width: 1024px) {
     header, #settings, .app-container {
         width: 100% !important;
@@ -376,14 +381,12 @@ main {
         border-radius: 0;
     }
 
-
     .app-container {
         display: flex !important;
         flex-direction: row !important;
-        height: calc(100vh - 120px) !important; /* Adjust based on your header height */
-        min-height: 100vh; 
+        height: 100dvh !important; 
         width: 100vw;
-        overflow: hidden !important; /* Allow content to flow down */
+        overflow: hidden !important;
         padding: 0 !important;
         gap: 5px;
     }
@@ -397,40 +400,38 @@ main {
         flex-shrink: 0;
         padding: 10px;
     }
-    
-/* 1. Stack the header and button */
-#sidePanel .header-with-action {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
-}
 
-/* 2. Move the text to the bottom and the button to the top */
-#sidePanel .header-with-action h2 {
-    order: 2; /* Moves text second */
-    font-size: 1.4 !important;
-    text-align: center;
-    margin: 0;
-    color: #4a5568;
-}
+    /* Sidebar Mobile Actions */
+    #sidePanel .header-with-action {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
 
-#sidePanel .plus-btn {
-    order: 1; /* Moves button first */
-    width: 100% !important;
-    height: 48px !important;
-    border-radius: 8px !important;
-    font-size: 1.4rem !important;
-    font-weight: bold;
-    background-color: var(--accent-color) !important; /* Professional dark blue */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: none;
-    color: white;
-}
+    #sidePanel .header-with-action h2 {
+        order: 2;
+        font-size: 1.4rem !important;
+        text-align: center;
+        margin: 0;
+        color: #4a5568;
+    }
 
+    #sidePanel .plus-btn {
+        order: 1;
+        width: 100% !important;
+        height: 48px !important;
+        border-radius: 8px !important;
+        font-size: 1.4rem !important;
+        font-weight: bold;
+        background-color: rgb(0, 160, 224) !important;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: none;
+        color: white;
+    }
 
     .column {
         min-height: auto !important;
@@ -438,24 +439,24 @@ main {
         padding: 5px;
     }
 
+    /* Court Grid Mobile */
     #courtGrid {
         flex-grow: 1;
         height: 100% !important; 
-        overflow-y: auto !important; /* Only this area scrolls! */
+        overflow-y: auto !important;
         display: block !important; 
-        -webkit-overflow-scrolling: touch; /* Makes scrolling smooth on iPhone */
-        padding: 10px;
+        -webkit-overflow-scrolling: touch;
+        padding: 10px 10px 150px 10px;
         gap: 15px;
     }
 
-   .court {
+    .court {
         width: 100% !important;
-        height: auto !important; /* THE FIX: Change from 42vh to auto */
-        min-height: 280px;      /* Keeps it looking like a court when empty */
+        height: auto !important;
+        min-height: 280px;
         margin-bottom: 20px;
         padding: 20px 15px !important;
         overflow: visible !important;
-       
     }
 
     .court.focused {
@@ -464,13 +465,13 @@ main {
         background-color: #f0f7ff;
     }
 
+    /* Player Cards Mobile */
     .player-card {
         width: 70% !important;
         font-size: 1.1rem;
         padding: 15px 10px 15px 30px !important;
     }
 
-    /* Add this inside your @media (max-width: 1024px) block */
     .court .player-card {
         width: 80% !important; 
         max-width: 220px;
@@ -483,47 +484,38 @@ main {
         height: 32px !important;
         left: -12px !important;
     }
-}
 
-/* --- Modal Pool Styling --- */
-.pool-modal-content {
-    width: 90% !important;
-    max-width: none;
-    height: 85vh !important;
-    margin: 5vh auto;
-    padding: 15px;
-}
+    /* Modal Mobile */
+    .pool-modal-content {
+        width: 90% !important;
+        max-width: none;
+        height: 85vh !important;
+        margin: 5vh auto;
+        padding: 15px;
+    }
 
-#playerDatabase {
-    flex: 1;
-    overflow-y: auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    padding: 10px;
-}
+    #playerDatabase {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
 
-#playerDatabase .player-card {
-    width: 100% !important;
-    box-sizing: border-box;
-    margin: 0;
-    padding: 15px 10px 15px 35px !important;
-}
+    #playerDatabase .player-card {
+        width: 100% !important;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 15px 10px 15px 35px !important;
+    }
 
-.add-all-btn, .close-pool-btn {
-    width: 100%;
-    padding: 15px;
-    font-size: 1.1rem;
-    margin: 10px 0;
-}
+    .add-all-btn, .close-pool-btn {
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+        margin: 10px 0;
+    }
 
-.slots-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    height: auto !important;
-    margin-bottom: 20px;
+    .slots-container {
+        height: auto !important;
+        margin-bottom: 20px;
+    }
 }
