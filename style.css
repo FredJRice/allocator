@@ -93,35 +93,34 @@ main {
 .column {
     display: flex;
     flex-direction: column;
-    background: white;
-    border-radius: 12px;
-    padding: 15px;
+    background: transparent; /* Makes the main sidebar area invisible */
+    padding: 0px;            /* Tightened up */
     height: 100%;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    box-shadow: none;        /* No shadow for the outer area */
     min-height: 580px;
     box-sizing: border-box;
 }
 
 .header-with-action {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end; 
     align-items: center;
     margin-bottom: 10px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #eee;
 }
 
-.queue-container, .pool-container {
+.queue-container {
     flex: 1;
     overflow-y: auto;
-    border: 1px dashed #cbd5e0;
+    /* RESTORED BORDER LOGIC */
+    border: 1px solid black; 
     border-radius: 8px;
-    background: #fafafa;
+    background: #fafafa;    /* You can set this to transparent if you want it to match exactly */
     padding: 15px;
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
     gap: 15px;
+    position: relative;     /* Needed for centering the "Player Queue" text */
 }
 
 /* ==========================================
@@ -347,11 +346,37 @@ main {
 
 .close-pool-btn {
     padding: 10px 20px;
-    background: rgb(0, 160, 224);
+    background: rgb(91, 93, 94);
     color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
+}
+
+#saveToPoolBtn{
+    width: 50% !important;
+    height: 50px !important;
+    background-color: rgb(0, 160, 224);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: block;;
+}
+
+#cancelAddPlayerBtn{
+    width: 50% !important;
+    height: 50px !important;
+    background-color: rgb(0, 160, 224);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    display: block;;
 }
 
 .free-label {
@@ -363,8 +388,8 @@ main {
 }
 
 .instruction-text {
-    font-size: 1rem;
-    color: #666;
+    font-size: 1.2rem;
+    color: rgb(38, 39, 96);
     margin: auto;
     text-align: center;
     font-style: italic;
@@ -490,6 +515,13 @@ main {
         width: 90% !important;
         max-width: none;
         height: 85vh !important;
+        margin: 5vh auto;
+        padding: 15px;
+    }
+     #addPlayerModalContent {
+        width: 90% !important;
+        max-width: none;
+        height: 25vh !important;
         margin: 5vh auto;
         padding: 15px;
     }

@@ -61,7 +61,7 @@ function generateCourts() {
             <div class="slots-container" id="slots-${i}">
                 <div class="status-box">
                     <span class="free-label">Free</span>
-                    <div class="instruction-text">Click here to add players</div>
+                    <div class="instruction-text">Tap here or drag to add players</div>
                 </div>
             </div>
             <div class="timer-display" id="timer-${i}">00:00:00</div>
@@ -281,26 +281,28 @@ window.removeSingleFromCourt = (e, courtId, element) => {
 function renderQueue() {
     const container = document.getElementById('playerQueue');
     if (!container) return;
-    container.innerHTML = '';
-    container.ondragover = (e) => e.preventDefault();
-    container.ondrop = (e) => handleDropToQueue(e);
+    
+    container.innerHTML = ''; // This is what was "taking it out"
 
+    // 1. Add the text if the queue is empty
+    if (queue.length === 0) {
+        const label = document.createElement('div');
+        label.className = 'instruction-text'; // Uses your existing CSS style
+        label.style.margin = 'auto';         // Centers it in the box
+        label.innerText = 'Player Queue';
+        container.appendChild(label);
+    }
+
+    // 2. Then draw the players as usual
     queue.forEach((player, index) => {
         const div = createPlayerCard(player.name);
         
-        // Tap to select (Sidebar logic)
         div.onclick = () => handleSidebarPlayerClick(index);
-        
-        // Delete button
         div.querySelector('.delete-btn').onclick = (e) => {
             e.stopPropagation();
             removeFromQueue(e, index);
         };
-
-        // Desktop Drag
         div.ondragstart = (e) => e.dataTransfer.setData("queueIndex", index);
-
-        // Universal Pointer Drag (The Add-on)
         div.onpointerdown = (e) => initTouchDrag(e, index, div);
 
         container.appendChild(div);

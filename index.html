@@ -29,9 +29,10 @@
             <div class="column">
                 <div class="header-with-action">
                     <button id="openPoolModalBtn" class="plus-btn">Add Players</button>
-                    <h2>Player Queue</h2>
                 </div>
-                <div id="playerQueue" class="queue-container"></div>
+                <div id="playerQueue" class="queue-container">
+                </div>
+                
             </div>
         </aside>
 
@@ -52,13 +53,13 @@
 </div>
 
     <div id="addPlayerModal" class="modal">
-        <div class="modal-content">
+        <div id="addPlayerModalContent" class="modal-content">
             <h3>Add New Player</h3>
-            <input type="text" id="newPlayerName" placeholder="Enter Name..." style="width:80%; padding:10px; margin-bottom:10px;">
+            <input type="text" id="newPlayerName" placeholder="Enter Name..." style="width:92%; padding:10px; margin-bottom:10px;">
             <br>
             <div style="display: flex; justify-content: center; gap: 10px;">
-                <button id="saveNewPlayerBtn" style="padding: 10px 15px;">Save to Pool</button>
-                <button onclick="closeAddPlayer()" style="padding: 10px 15px;">Cancel</button>
+                <button id="saveToPoolBtn">Save to Pool</button>
+                <button id="cancelAddPlayerBtn" onclick="closeAddPlayer()">Cancel</button>
             </div>
         </div>
     </div>
