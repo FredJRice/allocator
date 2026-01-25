@@ -8,7 +8,6 @@
     <link rel="apple-touch-icon" href="Gemini_Generated_Image_1qp5hq1qp5hq1qp5.png">
     <script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0/index.min.js"></script>
     <script>
-    // This connects your finger movements to the JS Drag events
     MobileDragDrop.polyfill({
         dragImageTranslateOverride: MobileDragDrop.scrollBehaviourDragImageTranslateOverride
     });
@@ -16,7 +15,7 @@
 </head>
 <body>
     <header>
-        <h1>Lansdown Racquets Club - Court Queue</h1>
+        <h1>Court Queue</h1>
     </header>
     
     <section id="settings">
@@ -31,24 +30,22 @@
                     <button id="openPoolModalBtn" class="plus-btn">Add Players</button>
                 </div>
                 <div id="playerQueue" class="queue-container">
-                </div>
-                
+                    </div>
             </div>
         </aside>
 
         <section id="courtGrid" class="court-grid">
-        </section>
+            </section>
     </main>
 
     <div id="poolModal" class="modal">
     <div class="modal-content pool-modal-content">
         <button id="openAddPlayerModalBtn" class="create-player-btn-long">Create New Player</button>
-        <button onclick="addAllToQueue()" class="add-all-btn">Add all to queue</button>
-        <h3 class="pool-header-text">Choose Players below</h3>
         
+        <h3 class="pool-header-text">Tap to select</h3>
         <div id="playerDatabase" class="pool-container modal-pool-grid"></div>
         
-        <button class="close-pool-btn" onclick="closePool()">Close</button>
+        <button id="addAllToQueueBtn" class="add-all-btn">Add all players & Close</button>
     </div>
 </div>
 
@@ -59,7 +56,7 @@
             <br>
             <div style="display: flex; justify-content: center; gap: 10px;">
                 <button id="saveToPoolBtn">Save to Pool</button>
-                <button id="cancelAddPlayerBtn" onclick="closeAddPlayer()">Cancel</button>
+                <button id="cancelAddPlayerBtn">Cancel</button>
             </div>
         </div>
     </div>

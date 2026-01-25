@@ -4,9 +4,9 @@
 let players = JSON.parse(localStorage.getItem('racquetPlayers')) || [];
 let queue = [];
 let timers = {};
-let config = { count: 4};
+let config = { count: 4 };
 let focusedCourtId = null;
-let activeGhost = null; // For the sliding drag effect on mobile
+let activeGhost = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     generateCourts();
@@ -14,9 +14,19 @@ document.addEventListener('DOMContentLoaded', () => {
     setupModals();
 
     document.getElementById('applySettings').addEventListener('click', () => {
+        // Smart Clear: Save active court players back to queue before resetting
+        document.querySelectorAll('.court .player-card').forEach(card => {
+            const name = card.getAttribute('data-name');
+            if (name) queue.push({ name: name, id: Date.now() + Math.random() });
+        });
+
         config.count = parseInt(document.getElementById('courtCount').value) || 4;
+        
+        // Stop all timers
         Object.keys(timers).forEach(id => stopTimer(id));
+        
         generateCourts();
+        renderQueue();
     });
 });
 
@@ -33,11 +43,14 @@ function createPlayerCard(name, courtId = null) {
     btn.innerText = '×';
     
     if (courtId) {
-        btn.onclick = (e) => window.removeSingleFromCourt(e, courtId, div);
+        btn.addEventListener('click', (e) => removeSingleFromCourt(e, courtId, div));
         div.ondragstart = (e) => {
             e.dataTransfer.setData("playerName", name);
             e.dataTransfer.setData("fromCourt", courtId);
         };
+    } else {
+        // Sidebar/Queue logic
+        div.addEventListener('click', () => handleSidebarPlayerClick(name));
     }
     
     div.appendChild(btn);
@@ -56,6 +69,8 @@ function generateCourts() {
         const court = document.createElement('div');
         court.className = 'court';
         court.id = `court-${i}`; 
+        
+        // Structure the court
         court.innerHTML = `
             <h3>Court ${i}</h3>
             <div class="slots-container" id="slots-${i}">
@@ -67,11 +82,11 @@ function generateCourts() {
             <div class="timer-display" id="timer-${i}">00:00:00</div>
         `;
         
-        court.onclick = (e) => { 
+        court.addEventListener('click', (e) => { 
             if (!e.target.closest('.player-card') && !e.target.closest('.delete-btn')) {
                 handleCourtClick(i); 
             }
-        };
+        });
         
         court.ondragover = (e) => e.preventDefault();
         court.ondrop = (e) => handleDropToCourt(e, i);
@@ -95,12 +110,9 @@ function updateCourtDisplay(courtId, playerArray) {
         `;
         stopTimer(courtId);
     } else {
-        // Determine where the "vs" should go
-        // If 2 players, middle is index 1. If 3 or 4 players, middle is index 2.
         const vsIndex = playerArray.length <= 2 ? 1 : 2;
 
         playerArray.forEach((p, index) => {
-            // Add the "vs" divider only at the specific middle point
             if (index === vsIndex) {
                 const vs = document.createElement('div');
                 vs.className = 'vs-text';
@@ -119,21 +131,16 @@ function handleCourtClick(courtId) {
     
     document.querySelectorAll('.court').forEach(c => c.classList.remove('focused'));
 
-    // If court has players, clear them back to queue and refill with exactly 2
     if (currentCards.length > 0) {
         currentCards.forEach(card => {
             const name = card.getAttribute('data-name');
             if (name) queue.push({ name: name, id: Date.now() + Math.random() });
         });
-        const nextPlayers = queue.splice(0, 2); // Hardcoded to 2
-        updateCourtDisplay(courtId, nextPlayers);
+        updateCourtDisplay(courtId, queue.splice(0, 2));
     } else {
-        // If court is empty, try to grab 2 players
         if (queue.length >= 2) {
-            const nextPlayers = queue.splice(0, 2); // Hardcoded to 2
-            updateCourtDisplay(courtId, nextPlayers);
+            updateCourtDisplay(courtId, queue.splice(0, 2));
         } else {
-            // Not enough players for a match, just focus it for manual adding
             focusedCourtId = courtId;
             document.getElementById(`court-${courtId}`).classList.add('focused');
         }
@@ -142,42 +149,41 @@ function handleCourtClick(courtId) {
     renderDatabase();
 }
 
-function handleSidebarPlayerClick(index) {
+function handleSidebarPlayerClick(name) {
     if (focusedCourtId !== null) {
         const container = document.getElementById(`slots-${focusedCourtId}`);
         const currentCards = container.querySelectorAll('.player-card');
 
-        // Allow manual adding up to 4 players
         if (currentCards.length < 4) {
-            const player = queue.splice(index, 1)[0];
-            const currentList = Array.from(currentCards).map(c => ({ name: c.getAttribute('data-name') }));
-            currentList.push(player);
-            
-            updateCourtDisplay(focusedCourtId, currentList);
-            renderQueue();
-            renderDatabase();
-        } else {
-            // Court is full (4 players), remove focus
+            const qIdx = queue.findIndex(p => p.name === name);
+            if (qIdx > -1) {
+                const player = queue.splice(qIdx, 1)[0];
+                const currentList = Array.from(currentCards).map(c => ({ name: c.getAttribute('data-name') }));
+                currentList.push(player);
+                
+                updateCourtDisplay(focusedCourtId, currentList);
+                renderQueue();
+                renderDatabase();
+            }
+        }
+        
+        if (container.querySelectorAll('.player-card').length >= 4) {
             focusedCourtId = null;
             document.querySelectorAll('.court').forEach(c => c.classList.remove('focused'));
         }
     }
 }
 
-// --- Universal Drag & Drop (Desktop + Mobile) ---
+// --- Universal Drag & Drop ---
 
 function initTouchDrag(e, index, originalElement) {
-    // Only handle primary touch/click
     if (e.pointerType === 'mouse' && e.button !== 0) return;
 
-    // Create a Ghost element to follow the finger
     activeGhost = originalElement.cloneNode(true);
     activeGhost.classList.add('drag-ghost');
-    // Ensure styles for the ghost are applied via JS in case CSS isn't loaded
     activeGhost.style.position = 'fixed';
     activeGhost.style.pointerEvents = 'none';
     activeGhost.style.zIndex = '9999';
-    activeGhost.style.opacity = '0.8';
     
     document.body.appendChild(activeGhost);
     
@@ -186,7 +192,6 @@ function initTouchDrag(e, index, originalElement) {
         activeGhost.style.left = `${x - (activeGhost.offsetWidth / 2)}px`;
         activeGhost.style.top = `${y - (activeGhost.offsetHeight / 2)}px`;
         
-        // Highlight courts while dragging over
         const hoverTarget = document.elementFromPoint(x, y)?.closest('.court');
         document.querySelectorAll('.court').forEach(c => c.classList.remove('court-drag-over'));
         if (hoverTarget) hoverTarget.classList.add('court-drag-over');
@@ -194,25 +199,18 @@ function initTouchDrag(e, index, originalElement) {
 
     moveAt(e.clientX, e.clientY);
 
-    function onPointerMove(ev) {
-        moveAt(ev.clientX, ev.clientY);
-    }
-
-    function onPointerUp(ev) {
+    const onPointerMove = (ev) => moveAt(ev.clientX, ev.clientY);
+    const onPointerUp = (ev) => {
         const dropTarget = document.elementFromPoint(ev.clientX, ev.clientY)?.closest('.court');
-        
         if (dropTarget) {
-            const courtId = dropTarget.id.split('-')[1];
-            handleDropToCourt(null, courtId, index); 
+            handleDropToCourt(null, dropTarget.id.split('-')[1], index); 
         }
-
         if (activeGhost) activeGhost.remove();
         activeGhost = null;
         document.querySelectorAll('.court').forEach(c => c.classList.remove('court-drag-over'));
-        
         window.removeEventListener('pointermove', onPointerMove);
         window.removeEventListener('pointerup', onPointerUp);
-    }
+    };
 
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
@@ -220,9 +218,7 @@ function initTouchDrag(e, index, originalElement) {
 
 function handleDropToCourt(e, courtId, manualIndex = null) {
     if (e) e.preventDefault();
-    
     let qIndex = (e && e.dataTransfer) ? e.dataTransfer.getData("queueIndex") : manualIndex;
-    
     if (qIndex === null || qIndex === "") return;
 
     const player = queue.splice(parseInt(qIndex), 1)[0];
@@ -230,7 +226,6 @@ function handleDropToCourt(e, courtId, manualIndex = null) {
         const container = document.getElementById(`slots-${courtId}`);
         const currentCards = container.querySelectorAll('.player-card');
 
-        // Hard limit of 4 players for drag and drop
         if (currentCards.length >= 4) {
             alert("Maximum 4 players per court.");
             queue.unshift(player); 
@@ -246,65 +241,49 @@ function handleDropToCourt(e, courtId, manualIndex = null) {
     }
 }
 
-function handleDropToQueue(e) {
-    e.preventDefault();
-    const fromCourt = e.dataTransfer.getData("fromCourt");
-    const pName = e.dataTransfer.getData("playerName");
+// --- Logic ---
 
-    if (fromCourt) {
-        const container = document.getElementById(`slots-${fromCourt}`);
-        const cards = Array.from(container.querySelectorAll('.player-card'));
-        const cardToMove = cards.find(c => c.getAttribute('data-name') === pName);
-        if (cardToMove) window.removeSingleFromCourt(e, fromCourt, cardToMove);
-    }
-}
-
-// --- Global Functions ---
-
-window.removeSingleFromCourt = (e, courtId, element) => {
+function removeSingleFromCourt(e, courtId, element) {
     if (e) { e.preventDefault(); e.stopPropagation(); }
     const name = element.getAttribute('data-name');
     if (!name) return;
 
     queue.push({ name: name, id: Date.now() });
-    element.remove();
     
     const container = document.getElementById(`slots-${courtId}`);
+    element.remove();
+    
     const remainingCards = container.querySelectorAll('.player-card');
     const remainingData = Array.from(remainingCards).map(c => ({ name: c.getAttribute('data-name') }));
     
     updateCourtDisplay(courtId, remainingData);
     renderQueue();
     renderDatabase();
-};
+}
 
 function renderQueue() {
     const container = document.getElementById('playerQueue');
     if (!container) return;
-    
-    container.innerHTML = ''; // This is what was "taking it out"
+    container.innerHTML = '';
 
-    // 1. Add the text if the queue is empty
     if (queue.length === 0) {
         const label = document.createElement('div');
-        label.className = 'instruction-text'; // Uses your existing CSS style
-        label.style.margin = 'auto';         // Centers it in the box
+        label.className = 'instruction-text';
+        label.style.margin = 'auto';
         label.innerText = 'Player Queue';
         container.appendChild(label);
     }
 
-    // 2. Then draw the players as usual
     queue.forEach((player, index) => {
         const div = createPlayerCard(player.name);
-        
-        div.onclick = () => handleSidebarPlayerClick(index);
-        div.querySelector('.delete-btn').onclick = (e) => {
+        div.querySelector('.delete-btn').addEventListener('click', (e) => {
             e.stopPropagation();
-            removeFromQueue(e, index);
-        };
+            queue.splice(index, 1);
+            renderQueue();
+            renderDatabase();
+        });
         div.ondragstart = (e) => e.dataTransfer.setData("queueIndex", index);
-        div.onpointerdown = (e) => initTouchDrag(e, index, div);
-
+        div.addEventListener('pointerdown', (e) => initTouchDrag(e, index, div));
         container.appendChild(div);
     });
 }
@@ -312,10 +291,7 @@ function renderQueue() {
 // --- Timers ---
 
 function startTimer(courtId) {
-    if (timers[courtId]) {
-        clearInterval(timers[courtId].interval);
-    }
-
+    if (timers[courtId]) clearInterval(timers[courtId].interval);
     timers[courtId] = { seconds: 0, interval: null };
     const el = document.getElementById(`timer-${courtId}`);
     
@@ -344,77 +320,109 @@ function setupModals() {
     const poolModal = document.getElementById("poolModal");
     const addModal = document.getElementById("addPlayerModal");
     
-    document.getElementById('openPoolModalBtn').onclick = () => { poolModal.style.display = "block"; renderDatabase(); };
-    document.getElementById('openAddPlayerModalBtn').onclick = () => { addModal.style.display = "block"; };
-    
-    window.onclick = (event) => {
-        if (event.target == poolModal) closePool();
-        if (event.target == addModal) closeAddPlayer();
-    };
+    const closePool = () => poolModal.style.display = "none";
+    const closeAddPlayer = () => addModal.style.display = "none";
 
-    document.getElementById('saveNewPlayerBtn').onclick = () => {
+    // 1. Add all to queue logic
+const addAllBtn = document.getElementById('addAllToQueueBtn');
+if (addAllBtn) {
+    addAllBtn.addEventListener('click', () => {
+        // 1. Add available players to the queue
+        players.filter(name => !isPlayerActive(name)).forEach(name => {
+            queue.push({ name: name, id: Date.now() + Math.random() });
+        });
+        
+        // 2. Refresh the UI
+        renderQueue();
+        renderDatabase();
+        
+        // 3. Close the modal automatically
+        poolModal.style.display = "none"; 
+    });
+}
+
+    // 2. Existing Modal Buttons
+    document.getElementById('openPoolModalBtn').addEventListener('click', () => {
+        poolModal.style.display = "block";
+        renderDatabase();
+    });
+
+    document.getElementById('openAddPlayerModalBtn').addEventListener('click', () => {
+        addModal.style.display = "block";
+    });
+
+    // 3. Closing buttons (using the new IDs from the HTML)
+    document.getElementById('closePoolModalBtn')?.addEventListener('click', closePool);
+    document.getElementById('cancelAddPlayerBtn')?.addEventListener('click', closeAddPlayer);
+
+    // 4. Save Logic
+    document.getElementById('saveToPoolBtn').addEventListener('click', () => {
         const input = document.getElementById('newPlayerName');
         const name = input.value.trim();
         if (name && !players.includes(name)) {
             players.push(name);
             localStorage.setItem('racquetPlayers', JSON.stringify(players));
-            input.value = ''; addModal.style.display = "none"; renderDatabase();
+            input.value = ''; 
+            closeAddPlayer();
+            renderDatabase();
         }
-    };
-}
+    });
 
-window.closePool = () => document.getElementById('poolModal').style.display = 'none';
-window.closeAddPlayer = () => document.getElementById('addPlayerModal').style.display = 'none';
+    // 5. Click outside to close
+    window.addEventListener('click', (event) => {
+        if (event.target == poolModal) closePool();
+        if (event.target == addModal) closeAddPlayer();
+    });
+}
 
 function renderDatabase() {
     const container = document.getElementById('playerDatabase');
     if (!container) return;
     container.innerHTML = '';
+    
     players.sort().forEach((name, index) => {
         const div = document.createElement('div');
         div.className = 'player-card';
         if (isPlayerActive(name)) div.classList.add('active-in-system');
 
-        div.innerHTML = `<button class="delete-btn" onclick="deleteFromDb(event, ${index})">×</button>${name}`;
-        div.onclick = (e) => {
-            if (e.target.tagName !== 'BUTTON' && !div.classList.contains('active-in-system')) {
-                queue.push({ name: name, id: Date.now() + Math.random() });
-                renderQueue(); renderDatabase();
+        const delBtn = document.createElement('button');
+        delBtn.className = 'delete-btn';
+        delBtn.innerText = '×';
+        delBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (confirm(`Delete ${name} from pool?`)) {
+                players.splice(index, 1);
+                localStorage.setItem('racquetPlayers', JSON.stringify(players));
+                renderDatabase();
             }
-        };
+        });
+
+        div.appendChild(delBtn);
+        div.appendChild(document.createTextNode(name));
+        
+        div.addEventListener('click', () => {
+            if (!isPlayerActive(name)) {
+                queue.push({ name: name, id: Date.now() + Math.random() });
+                renderQueue();
+                renderDatabase();
+            }
+        });
         container.appendChild(div);
     });
 }
 
+// Accessible globally for the HTML button
 window.addAllToQueue = function() {
-    const availablePlayers = players.filter(name => !isPlayerActive(name));
-    if (availablePlayers.length === 0) return;
-    availablePlayers.forEach(name => {
+    players.filter(name => !isPlayerActive(name)).forEach(name => {
         queue.push({ name: name, id: Date.now() + Math.random() });
     });
     renderQueue();
     renderDatabase();
 };
 
-window.deleteFromDb = (e, index) => { 
-    e.stopPropagation(); 
-    if (confirm("Delete player from pool?")) { 
-        players.splice(index, 1); 
-        localStorage.setItem('racquetPlayers', JSON.stringify(players)); 
-        renderDatabase(); 
-    } 
-};
-
-function removeFromQueue(e, index) { 
-    e.stopPropagation(); 
-    queue.splice(index, 1); 
-    renderQueue(); 
-    renderDatabase();
-}
-
 function isPlayerActive(name) {
     const inQueue = queue.some(p => p.name === name);
-    const allCourtCards = document.querySelectorAll('.court .player-card');
-    const inCourt = Array.from(allCourtCards).some(card => card.getAttribute('data-name') === name);
+    const inCourt = Array.from(document.querySelectorAll('.court .player-card'))
+                         .some(card => card.getAttribute('data-name') === name);
     return inQueue || inCourt;
 }
