@@ -95,8 +95,13 @@ function updateCourtDisplay(courtId, playerArray) {
         `;
         stopTimer(courtId);
     } else {
+        // Determine where the "vs" should go
+        // If 2 players, middle is index 1. If 3 or 4 players, middle is index 2.
+        const vsIndex = playerArray.length <= 2 ? 1 : 2;
+
         playerArray.forEach((p, index) => {
-            if (index > 0) {
+            // Add the "vs" divider only at the specific middle point
+            if (index === vsIndex) {
                 const vs = document.createElement('div');
                 vs.className = 'vs-text';
                 vs.innerText = 'vs';
