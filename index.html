@@ -8,20 +8,15 @@
     <link rel="apple-touch-icon" href="Gemini_Generated_Image_1qp5hq1qp5hq1qp5.png">
     <script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0/index.min.js"></script>
     <script>
-    MobileDragDrop.polyfill({
-        dragImageTranslateOverride: MobileDragDrop.scrollBehaviourDragImageTranslateOverride
-    });
+        MobileDragDrop.polyfill({
+            dragImageTranslateOverride: MobileDragDrop.scrollBehaviourDragImageTranslateOverride
+        });
     </script>
 </head>
 <body>
     <header>
         <h1>Court Queue</h1>
     </header>
-    
-    <section id="settings">
-        <label>Courts: <input type="number" id="courtCount" value="4"></label>
-        <button id="applySettings">Apply/Clear</button>
-    </section>
 
     <main class="app-container">
         <aside id="sidePanel" class="sidebar-container">
@@ -29,25 +24,26 @@
                 <div class="header-with-action">
                     <button id="openPoolModalBtn" class="plus-btn">Add Players</button>
                 </div>
-                <div id="playerQueue" class="queue-container">
-                    </div>
+                <div id="playerQueue" class="queue-container"></div>
             </div>
         </aside>
 
-        <section id="courtGrid" class="court-grid">
-            </section>
+        <section id="courtGrid" class="court-grid"></section>
     </main>
 
     <div id="poolModal" class="modal">
-    <div class="modal-content pool-modal-content">
-        <button id="openAddPlayerModalBtn" class="create-player-btn-long">Create New Player</button>
-        
-        <h3 class="pool-header-text">Tap to select</h3>
-        <div id="playerDatabase" class="pool-container modal-pool-grid"></div>
-        
-        <button id="addAllToQueueBtn" class="add-all-btn">Add all players & Close</button>
+        <div class="modal-content pool-modal-content">
+            <button id="openAddPlayerModalBtn" class="create-player-btn-long">Create New Player</button>
+            
+            <h3 class="pool-header-text">Tap to select</h3>
+            <div id="playerDatabase" class="pool-container modal-pool-grid"></div>
+            
+            <div class="modal-footer">
+                <button id="addAllToQueueBtn" class="add-all-btn">Add All</button>
+                <button id="closePoolModalBtn" class="close-pool-btn">Close</button>
+            </div>
+            </div>
     </div>
-</div>
 
     <div id="addPlayerModal" class="modal">
         <div id="addPlayerModalContent" class="modal-content">
@@ -60,6 +56,14 @@
             </div>
         </div>
     </div>
+
+    <footer class="main-footer">
+        <div class="footer-controls">
+            <button id="openSettingsBtn" class="footer-btn">⚙️</button>
+            <button id="openInfoBtn" class="footer-btn">Info</button>
+            <button id="clearAllBtn" class="footer-btn danger">Clear All</button>
+        </div>
+    </footer>
 
     <script src="script.js"></script>
 </body>

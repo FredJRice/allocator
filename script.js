@@ -13,21 +13,32 @@ document.addEventListener('DOMContentLoaded', () => {
     renderQueue();
     setupModals();
 
-    document.getElementById('applySettings').addEventListener('click', () => {
-        // Smart Clear: Save active court players back to queue before resetting
-        document.querySelectorAll('.court .player-card').forEach(card => {
-            const name = card.getAttribute('data-name');
-            if (name) queue.push({ name: name, id: Date.now() + Math.random() });
-        });
+    // --- FOOTER BUTTONS ---
 
-        config.count = parseInt(document.getElementById('courtCount').value) || 4;
-        
-        // Stop all timers
-        Object.keys(timers).forEach(id => stopTimer(id));
-        
-        generateCourts();
-        renderQueue();
-    });
+    // 1. Settings (Replaces the old 'applySettings' logic)
+    document.getElementById('openSettingsBtn').onclick = () => {
+        const val = prompt("Enter number of courts:", config.count);
+        if (val !== null) {
+            config.count = parseInt(val) || 4;
+            generateCourts();
+        }
+    };
+
+    // 2. Info
+    document.getElementById('openInfoBtn').onclick = () => {
+        alert("Quick Help:\n- Drag players to courts\n- Tap a court to auto-fill\n- Add players from the Pool button");
+    };
+
+    // 3. Clear All
+    document.getElementById('clearAllBtn').onclick = () => {
+        if (confirm("Reset everything? This clears courts and the queue.")) {
+            queue = [];
+            Object.keys(timers).forEach(id => stopTimer(id));
+            generateCourts();
+            renderQueue();
+            renderDatabase();
+        }
+    };
 });
 
 // --- UI Helpers ---
@@ -49,7 +60,6 @@ function createPlayerCard(name, courtId = null) {
             e.dataTransfer.setData("fromCourt", courtId);
         };
     } else {
-        // Sidebar/Queue logic
         div.addEventListener('click', () => handleSidebarPlayerClick(name));
     }
     
@@ -69,8 +79,6 @@ function generateCourts() {
         const court = document.createElement('div');
         court.className = 'court';
         court.id = `court-${i}`; 
-        
-        // Structure the court
         court.innerHTML = `
             <h3>Court ${i}</h3>
             <div class="slots-container" id="slots-${i}">
@@ -90,7 +98,6 @@ function generateCourts() {
         
         court.ondragover = (e) => e.preventDefault();
         court.ondrop = (e) => handleDropToCourt(e, i);
-        
         grid.appendChild(court);
     }
 }
@@ -98,7 +105,6 @@ function generateCourts() {
 function updateCourtDisplay(courtId, playerArray) {
     const container = document.getElementById(`slots-${courtId}`);
     if (!container) return;
-    
     container.innerHTML = '';
     
     if (!playerArray || playerArray.length === 0) {
@@ -111,7 +117,6 @@ function updateCourtDisplay(courtId, playerArray) {
         stopTimer(courtId);
     } else {
         const vsIndex = playerArray.length <= 2 ? 1 : 2;
-
         playerArray.forEach((p, index) => {
             if (index === vsIndex) {
                 const vs = document.createElement('div');
@@ -128,7 +133,6 @@ function updateCourtDisplay(courtId, playerArray) {
 function handleCourtClick(courtId) {
     const container = document.getElementById(`slots-${courtId}`);
     const currentCards = container.querySelectorAll('.player-card');
-    
     document.querySelectorAll('.court').forEach(c => c.classList.remove('focused'));
 
     if (currentCards.length > 0) {
@@ -160,7 +164,6 @@ function handleSidebarPlayerClick(name) {
                 const player = queue.splice(qIdx, 1)[0];
                 const currentList = Array.from(currentCards).map(c => ({ name: c.getAttribute('data-name') }));
                 currentList.push(player);
-                
                 updateCourtDisplay(focusedCourtId, currentList);
                 renderQueue();
                 renderDatabase();
@@ -178,40 +181,33 @@ function handleSidebarPlayerClick(name) {
 
 function initTouchDrag(e, index, originalElement) {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
-
     activeGhost = originalElement.cloneNode(true);
     activeGhost.classList.add('drag-ghost');
     activeGhost.style.position = 'fixed';
     activeGhost.style.pointerEvents = 'none';
     activeGhost.style.zIndex = '9999';
-    
     document.body.appendChild(activeGhost);
     
     const moveAt = (x, y) => {
         if (!activeGhost) return;
         activeGhost.style.left = `${x - (activeGhost.offsetWidth / 2)}px`;
         activeGhost.style.top = `${y - (activeGhost.offsetHeight / 2)}px`;
-        
         const hoverTarget = document.elementFromPoint(x, y)?.closest('.court');
         document.querySelectorAll('.court').forEach(c => c.classList.remove('court-drag-over'));
         if (hoverTarget) hoverTarget.classList.add('court-drag-over');
     };
 
     moveAt(e.clientX, e.clientY);
-
     const onPointerMove = (ev) => moveAt(ev.clientX, ev.clientY);
     const onPointerUp = (ev) => {
         const dropTarget = document.elementFromPoint(ev.clientX, ev.clientY)?.closest('.court');
-        if (dropTarget) {
-            handleDropToCourt(null, dropTarget.id.split('-')[1], index); 
-        }
+        if (dropTarget) handleDropToCourt(null, dropTarget.id.split('-')[1], index); 
         if (activeGhost) activeGhost.remove();
         activeGhost = null;
         document.querySelectorAll('.court').forEach(c => c.classList.remove('court-drag-over'));
         window.removeEventListener('pointermove', onPointerMove);
         window.removeEventListener('pointerup', onPointerUp);
     };
-
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
 }
@@ -225,14 +221,12 @@ function handleDropToCourt(e, courtId, manualIndex = null) {
     if (player) {
         const container = document.getElementById(`slots-${courtId}`);
         const currentCards = container.querySelectorAll('.player-card');
-
         if (currentCards.length >= 4) {
             alert("Maximum 4 players per court.");
             queue.unshift(player); 
             renderQueue();
             return;
         }
-
         const currentList = Array.from(currentCards).map(c => ({ name: c.getAttribute('data-name') }));
         currentList.push(player);
         updateCourtDisplay(courtId, currentList);
@@ -241,21 +235,14 @@ function handleDropToCourt(e, courtId, manualIndex = null) {
     }
 }
 
-// --- Logic ---
-
 function removeSingleFromCourt(e, courtId, element) {
     if (e) { e.preventDefault(); e.stopPropagation(); }
     const name = element.getAttribute('data-name');
     if (!name) return;
-
     queue.push({ name: name, id: Date.now() });
-    
     const container = document.getElementById(`slots-${courtId}`);
     element.remove();
-    
-    const remainingCards = container.querySelectorAll('.player-card');
-    const remainingData = Array.from(remainingCards).map(c => ({ name: c.getAttribute('data-name') }));
-    
+    const remainingData = Array.from(container.querySelectorAll('.player-card')).map(c => ({ name: c.getAttribute('data-name') }));
     updateCourtDisplay(courtId, remainingData);
     renderQueue();
     renderDatabase();
@@ -294,7 +281,6 @@ function startTimer(courtId) {
     if (timers[courtId]) clearInterval(timers[courtId].interval);
     timers[courtId] = { seconds: 0, interval: null };
     const el = document.getElementById(`timer-${courtId}`);
-    
     timers[courtId].interval = setInterval(() => {
         timers[courtId].seconds++;
         let sec = timers[courtId].seconds;
@@ -319,29 +305,21 @@ function stopTimer(courtId) {
 function setupModals() {
     const poolModal = document.getElementById("poolModal");
     const addModal = document.getElementById("addPlayerModal");
-    
     const closePool = () => poolModal.style.display = "none";
     const closeAddPlayer = () => addModal.style.display = "none";
 
-    // 1. Add all to queue logic
-const addAllBtn = document.getElementById('addAllToQueueBtn');
-if (addAllBtn) {
-    addAllBtn.addEventListener('click', () => {
-        // 1. Add available players to the queue
-        players.filter(name => !isPlayerActive(name)).forEach(name => {
-            queue.push({ name: name, id: Date.now() + Math.random() });
+    const addAllBtn = document.getElementById('addAllToQueueBtn');
+    if (addAllBtn) {
+        addAllBtn.addEventListener('click', () => {
+            players.filter(name => !isPlayerActive(name)).forEach(name => {
+                queue.push({ name: name, id: Date.now() + Math.random() });
+            });
+            renderQueue();
+            renderDatabase();
+            // REMOVED: poolModal.style.display = "none"; (User wants manual close)
         });
-        
-        // 2. Refresh the UI
-        renderQueue();
-        renderDatabase();
-        
-        // 3. Close the modal automatically
-        poolModal.style.display = "none"; 
-    });
-}
+    }
 
-    // 2. Existing Modal Buttons
     document.getElementById('openPoolModalBtn').addEventListener('click', () => {
         poolModal.style.display = "block";
         renderDatabase();
@@ -351,11 +329,9 @@ if (addAllBtn) {
         addModal.style.display = "block";
     });
 
-    // 3. Closing buttons (using the new IDs from the HTML)
     document.getElementById('closePoolModalBtn')?.addEventListener('click', closePool);
     document.getElementById('cancelAddPlayerBtn')?.addEventListener('click', closeAddPlayer);
 
-    // 4. Save Logic
     document.getElementById('saveToPoolBtn').addEventListener('click', () => {
         const input = document.getElementById('newPlayerName');
         const name = input.value.trim();
@@ -368,7 +344,6 @@ if (addAllBtn) {
         }
     });
 
-    // 5. Click outside to close
     window.addEventListener('click', (event) => {
         if (event.target == poolModal) closePool();
         if (event.target == addModal) closeAddPlayer();
@@ -399,7 +374,6 @@ function renderDatabase() {
 
         div.appendChild(delBtn);
         div.appendChild(document.createTextNode(name));
-        
         div.addEventListener('click', () => {
             if (!isPlayerActive(name)) {
                 queue.push({ name: name, id: Date.now() + Math.random() });
@@ -410,15 +384,6 @@ function renderDatabase() {
         container.appendChild(div);
     });
 }
-
-// Accessible globally for the HTML button
-window.addAllToQueue = function() {
-    players.filter(name => !isPlayerActive(name)).forEach(name => {
-        queue.push({ name: name, id: Date.now() + Math.random() });
-    });
-    renderQueue();
-    renderDatabase();
-};
 
 function isPlayerActive(name) {
     const inQueue = queue.some(p => p.name === name);
