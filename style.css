@@ -46,7 +46,7 @@ header, #settings {
 header {
     background: linear-gradient(135deg, rgb(0, 160, 224) 50%, rgb(38, 39, 96) 130%);
     text-align: center;
-    margin: 0 auto;
+    margin: 0;
     padding: 8px;
     border-bottom: 1px solid #ddd;
     flex-shrink: 0;
@@ -504,9 +504,7 @@ main {
         width: 100% !important;
         margin: 0 !important;
         border-radius: 0 !important;
-        /* This pushes the TEXT down but lets the BLUE background fill the notch */
         padding-top: env(safe-area-inset-top, 20px) !important;
-        padding-bottom: 10px;
     }
 
     #settings, .app-container {
