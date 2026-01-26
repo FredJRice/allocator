@@ -39,7 +39,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Info
     document.getElementById('openInfoBtn').onclick = () => {
-        alert("Quick Help:\n1. Click on 'Add Players'\n2. Tap a player to add them or select 'Add all'\n-3. Click a court to auto add");
+        alert(`How to use Court Queue:
+          1. Click on 'Add Players'
+          2. Tap on a player to add them or select 'Add all'
+          3. Click a court to auto add or drag player to the court
+          
+          Click '×' on a player to remove them
+          Click 'Clear All' to reset
+          Timers start/stop automatically
+          Copyright © 2024 Court Queue - Fred Rice`);
     };
 
     // 3. Clear All
