@@ -72,7 +72,7 @@ header {
 main {
     display: grid;
     grid-template-columns: 340px 1fr; 
-    background-image: url('40099290-41C7-4A42-A624-1A0257433F24.jpeg');
+    background-image: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)),url('40099290-41C7-4A42-A624-1A0257433F24.jpeg');
     background-size: cover;
     background-position: center;
     width: 50%;
