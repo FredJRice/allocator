@@ -1,17 +1,30 @@
 "use strict";
 
-// --- State Management ---
+// 1. DATA & STATE
+const defaultPlayers = ["Jahangir Khan", "Jansher Khan", "Geoff Hunt", "Heather McKay", "Nicol David", "Ramy Ashour", "Jonathon Power", "Amr Shabana", "Peter Nicol", "Susan Devoy"];
+
+// Check for your existing 'racquetPlayers' list
 let players = JSON.parse(localStorage.getItem('racquetPlayers')) || [];
+
+// If the list is totally empty, inject the test squad
+if (players.length === 0) {
+    players = [...defaultPlayers];
+    localStorage.setItem('racquetPlayers', JSON.stringify(players));
+}
+
 let queue = [];
 let timers = {};
 let config = { count: 4 };
 let focusedCourtId = null;
 let activeGhost = null;
 
+// 2. INITIALIZATION
 document.addEventListener('DOMContentLoaded', () => {
     generateCourts();
     renderQueue();
     setupModals();
+    renderDatabase(); // CRITICAL: This draws the players in the modal
+});
 
     // --- FOOTER BUTTONS ---
 
@@ -39,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
             renderDatabase();
         }
     };
-});
 
 // --- UI Helpers ---
 
@@ -365,11 +377,9 @@ function renderDatabase() {
         delBtn.innerText = '×';
         delBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (confirm(`Delete ${name} from pool?`)) {
                 players.splice(index, 1);
                 localStorage.setItem('racquetPlayers', JSON.stringify(players));
                 renderDatabase();
-            }
         });
 
         div.appendChild(delBtn);
@@ -391,3 +401,15 @@ function isPlayerActive(name) {
                          .some(card => card.getAttribute('data-name') === name);
     return inQueue || inCourt;
 }
+
+document.addEventListener('dragend', function() {
+    // Look for the specific class the polyfill uses for the ghost image
+    const ghost = document.querySelector('.dnd-poly-drag-image');
+    if (ghost) {
+        ghost.remove();
+    }
+    
+    // Also remove any custom ghost classes you might have
+    const customGhosts = document.querySelectorAll('.drag-ghost');
+    customGhosts.forEach(g => g.remove());
+});

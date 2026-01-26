@@ -292,6 +292,18 @@ main {
     font-weight: 600;
 }
 
+/* Force any lingering polyfill ghosts to disappear */
+.dnd-poly-drag-image, 
+[drag-ghost] {
+    pointer-events: none !important;
+}
+
+/* If the ghost stays after the drag ends, this helps hide it */
+.dragging-active .player-card {
+    opacity: 0.5;
+}
+
+
 .plus-btn {
      width: 100% !important;
     height: 55px !important;    /* Forces an exact match */
@@ -548,7 +560,7 @@ main {
         overflow-y: auto !important;
         display: block !important; 
         -webkit-overflow-scrolling: touch;
-        padding: 10px 10px 10px 10px;
+        padding: 15px 10px 10px 10px;
         gap: 15px;
     }
 
@@ -637,5 +649,21 @@ main {
     .slots-container {
         height: auto !important;
         margin-bottom: 20px;
+    }
+}
+@media (max-width: 600px) {
+    #sidePanel {
+        width: 150px;
+    }
+
+    .player-card {
+        width: 130px !important;
+        font-size: 0.9rem;
+        padding: 10px 8px 10px 20px !important;
+    }
+
+    .court .player-card {
+        width: 90% !important; 
+        max-width: 180px;
     }
 }
