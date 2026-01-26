@@ -46,11 +46,10 @@ header, #settings {
 header {
     background: linear-gradient(135deg, rgb(0, 160, 224) 50%, rgb(38, 39, 96) 130%);
     text-align: center;
-    margin-top: 5px;
+    margin-top: 0 auto;
     padding: 8px;
     border-bottom: 1px solid #ddd;
     flex-shrink: 0;
-    border-radius: 8px 8px 0 0;
 }
 
 #settings {
@@ -492,10 +491,11 @@ main {
    ========================================== */
 @media (max-width: 1024px) {
     header, #settings, .app-container {
-        padding-top: env(safe-area-inset-top) !important;
+        padding-top: env(safe-area-inset-top, 20px) !important;
         width: 100% !important;
         margin: 0;
         border-radius: 0;
+        padding-bottom: 10px;
     }
 
     .app-container {
