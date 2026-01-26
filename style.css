@@ -81,25 +81,26 @@ main {
     max-width: 1400px;
     margin: 0 auto;
     gap: 10px;
-    padding: 20px 0;
-    height: calc(100vh - 150px);
+    padding: 10px 0;
+    height: calc(100vh - 200px);
     overflow: hidden;
-    align-items: start;
+    align-items: stretch;
 }
 
 #sidePanel {
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* This prevents the sidebar itself from growing off-screen */
 }
 
 .column {
     display: flex;
     flex-direction: column;
-    background: var(--primary-bg); /* Match the main page grey */
+    background: var(--primary-bg);
     padding: 0px;            
-    height: 100%;
-    box-shadow: none;
-    border: none;        
-    min-height: 580px;
+    height: auto;        /* Let the children define the height */
+    min-height: 0;       /* REMOVE the 580px */
     box-sizing: border-box;
 }
 
@@ -111,18 +112,18 @@ main {
 }
 
 .queue-container {
-    flex: 1;
-    overflow-y: auto;
-    /* RESTORED BORDER LOGIC */
+    height: calc(100vh - 200px) !important;
+    overflow-y: auto;          /* Scroll inside this height */
     border: 2px solid black; 
     border-radius: 8px;
-    background: #fafafa;    /* You can set this to transparent if you want it to match exactly */
+    background: #fafafa;
     padding: 15px;
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
     gap: 15px;
-    position: relative;     /* Needed for centering the "Player Queue" text */
+    position: relative;
+    box-sizing: border-box;
 }
 
 .main-footer {
@@ -179,10 +180,12 @@ main {
     grid-auto-rows: min-content !important;
     gap: 20px;
     justify-content: center;
-    height: 100%;
+    height: calc(100vh - 200px);
     overflow-y: auto; 
     padding-right: 10px;
-    scrollbar-width: auto;
+    padding-bottom: 100px;
+    box-sizing: border-box;
+    scrollbar-width:thin;
 }
 
 .court {
@@ -248,9 +251,12 @@ main {
     font-size: 14px;
     font-weight: 600;
     cursor: grab;
-    width: fit-content;
-    min-width: 90px;
-    touch-action: none !important;
+    width: 140px;            /* Fixed width keeps sidebar slim */
+    height: auto;           /* Allows card to grow downwards */
+    white-space: normal;    /* Allows text to wrap to next line */
+    word-break: break-word; /* Forces long strings like 'Ksjsj...' to break */
+    line-height: 1.3;       /* Better spacing for wrapped text */
+    touch-action: pan-y !important;
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
@@ -454,12 +460,11 @@ main {
         padding: 0 !important;
         gap: 5px;
     }
-
-    @media (max-width: 1024px) {
+    
     #sidePanel {
-        width: 180px;
-        height: 95% !important;
-        overflow-y: auto;
+        width: 190px;
+        height: calc(100vh - 185px) !important;
+        overflow: hidden;
         background-color: var(--primary-bg); /* Match the grey here too */
         border-right: none;
         flex-shrink: 0;
@@ -507,11 +512,11 @@ main {
     /* Court Grid Mobile */
     #courtGrid {
         flex-grow: 1;
-        height: 100% !important; 
+        height: calc(100vh - 180px) !important;
         overflow-y: auto !important;
         display: block !important; 
         -webkit-overflow-scrolling: touch;
-        padding: 10px 10px 150px 10px;
+        padding: 10px 10px 100px 10px;
         gap: 15px;
     }
 
@@ -532,8 +537,8 @@ main {
 
     /* Player Cards Mobile */
     .player-card {
-        width: 70% !important;
-        font-size: 1.1rem;
+        width: 160px !important;
+        font-size: 1rem;
         padding: 15px 10px 15px 30px !important;
     }
 
@@ -590,5 +595,4 @@ main {
         height: auto !important;
         margin-bottom: 20px;
     }
-}
 }
