@@ -193,37 +193,69 @@ function handleSidebarPlayerClick(name) {
 
 function initTouchDrag(e, index, originalElement) {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
+
+    // 1. Create and Style the Ghost
     activeGhost = originalElement.cloneNode(true);
     activeGhost.classList.add('drag-ghost');
-    activeGhost.style.position = 'fixed';
-    activeGhost.style.pointerEvents = 'none';
-    activeGhost.style.zIndex = '9999';
+    
+    // Ensure the ghost is visible and floating
+    Object.assign(activeGhost.style, {
+        position: 'fixed',
+        pointerEvents: 'none', // Critical: prevents ghost from blocking drop targets
+        zIndex: '9999',
+        opacity: '0.8',
+        left: '0px',
+        top: '0px'
+    });
+
     document.body.appendChild(activeGhost);
     
     const moveAt = (x, y) => {
         if (!activeGhost) return;
+        // Center the ghost under the finger/cursor
         activeGhost.style.left = `${x - (activeGhost.offsetWidth / 2)}px`;
         activeGhost.style.top = `${y - (activeGhost.offsetHeight / 2)}px`;
+
+        // Visual feedback for hovering over a court
         const hoverTarget = document.elementFromPoint(x, y)?.closest('.court');
         document.querySelectorAll('.court').forEach(c => c.classList.remove('court-drag-over'));
         if (hoverTarget) hoverTarget.classList.add('court-drag-over');
     };
 
     moveAt(e.clientX, e.clientY);
+
     const onPointerMove = (ev) => moveAt(ev.clientX, ev.clientY);
+
     const onPointerUp = (ev) => {
         const dropTarget = document.elementFromPoint(ev.clientX, ev.clientY)?.closest('.court');
-        if (dropTarget) handleDropToCourt(null, dropTarget.id.split('-')[1], index); 
-        if (activeGhost) activeGhost.remove();
-        activeGhost = null;
-        document.querySelectorAll('.court').forEach(c => c.classList.remove('court-drag-over'));
+        
+        if (dropTarget) {
+            const courtId = dropTarget.id.split('-')[1];
+            handleDropToCourt(null, courtId, index); 
+        }
+
+        // 2. THE IMPROVED CLEANUP (The iPhone Fix)
+        // We use a tiny timeout to ensure the browser processes the drop before deleting the UI
+        setTimeout(() => {
+            if (activeGhost) {
+                activeGhost.remove();
+                activeGhost = null;
+            }
+
+            // Nuclear Option: Delete any stray ghosts that might have been left behind
+            document.querySelectorAll('.drag-ghost, .dnd-poly-drag-image').forEach(el => el.remove());
+            
+            // Clear all hover highlights
+            document.querySelectorAll('.court').forEach(c => c.classList.remove('court-drag-over'));
+        }, 10);
+
         window.removeEventListener('pointermove', onPointerMove);
         window.removeEventListener('pointerup', onPointerUp);
     };
+
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
 }
-
 function handleDropToCourt(e, courtId, manualIndex = null) {
     if (e) e.preventDefault();
     let qIndex = (e && e.dataTransfer) ? e.dataTransfer.getData("queueIndex") : manualIndex;
