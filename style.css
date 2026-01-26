@@ -20,11 +20,6 @@ html, body {
     padding: 0 !important;
     overflow: hidden; 
     font-family: -apple-system, system-ui, sans-serif;
-    background-color: var(--primary-bg);
-    background-size: 25%;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
 }
 
 body {
@@ -100,7 +95,7 @@ main {
 .column {
     display: flex;
     flex-direction: column;
-    background: var(--primary-bg);
+    background: transparent;
     padding: 0px;            
     height: auto;        /* Let the children define the height */
     min-height: 0;       /* REMOVE the 580px */
@@ -528,7 +523,7 @@ main {
         width: 190px;
         height: calc(100vh - 200px) !important;
         overflow: hidden;
-        background-color: var(--primary-bg); /* Match the grey here too */
+        background-color: transparent;
         border-right: none;
         flex-shrink: 0;
         padding: 10px;
