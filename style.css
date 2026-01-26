@@ -50,7 +50,8 @@ header {
     padding: 8px;
     border-bottom: 1px solid #ddd;
     flex-shrink: 0;
-    width: 100%;
+    width: 100%; /* Default to full width for mobile */
+    box-sizing: border-box;
 }
 
 #settings {
@@ -487,16 +488,32 @@ main {
     pointer-events: none;
 }
 
+/* Ensure desktop width remains 50% */
+@media (min-width: 1025px) {
+    header, #settings, main {
+        width: 50% !important;
+    }
+}
+
+
 /* ==========================================
    8. MEDIA QUERIES (TABLET & MOBILE)
    ========================================== */
 @media (max-width: 1024px) {
-    header, #settings, .app-container {
-        padding-top: env(safe-area-inset-top, 20px) !important;
+    header {
         width: 100% !important;
         margin: 0 !important;
         border-radius: 0 !important;
+        /* This pushes the TEXT down but lets the BLUE background fill the notch */
+        padding-top: env(safe-area-inset-top, 20px) !important;
         padding-bottom: 10px;
+    }
+
+    #settings, .app-container {
+        width: 100% !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        padding-top: 0 !important; /* Remove safe-area padding here */
     }
 
     .app-container {
