@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Info
     document.getElementById('openInfoBtn').onclick = () => {
-        alert("Quick Help:\n- Drag players to courts\n- Tap a court to auto-fill\n- Add players from the Pool button");
+        alert("Quick Help:\n1. Click on 'Add Players'\n2. Tap a player to add them or select 'Add all'\n-3. Click a court to auto add");
     };
 
     // 3. Clear All
