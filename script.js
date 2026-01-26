@@ -1,7 +1,7 @@
 "use strict";
 
 // 1. DATA & STATE
-const defaultPlayers = ["Jahangir Khan", "Jansher Khan", "Geoff Hunt", "Heather McKay", "Nicol David", "Ramy Ashour", "Jonathon Power", "Amr Shabana", "Peter Nicol", "Susan Devoy"];
+const defaultPlayers = ["Jahangir Khan", "Jansher Khan", "Geoff Hunt", "Heather McKay", "Nicol David", "Nick Matthew", "Jonathon Power", "Amr Shabana", "Peter Nicol", "Susan Devoy"];
 
 // Check for your existing 'racquetPlayers' list
 let players = JSON.parse(localStorage.getItem('racquetPlayers')) || [];
