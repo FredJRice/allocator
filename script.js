@@ -4,7 +4,7 @@
 let players = JSON.parse(localStorage.getItem('racquetPlayers')) || [];
 let queue = [];
 let timers = {};
-let config = { count: 8 };
+let config = { count: 4 };
 let focusedCourtId = null;
 let activeGhost = null;
 
