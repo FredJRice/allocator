@@ -493,6 +493,7 @@ main {
    ========================================== */
 @media (max-width: 1024px) {
     header, #settings, .app-container {
+        padding-top: env(safe-area-inset-top) !important;
         width: 100% !important;
         margin: 0;
         border-radius: 0;
