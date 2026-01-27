@@ -129,7 +129,7 @@ main {
     bottom: 0;
     left: 0;
     width: 100%;
-    background: #ffffff;
+    background: #b0b4b7;
     border-top: 1px solid #ddd;
     padding: 10px 0;
     z-index: 1000; /* Ensures it stays above other elements */
@@ -149,7 +149,8 @@ main {
     flex: 1;
     max-width: 200px;
     height: 45px;
-    background: #f8f9fa;
+    background: linear-gradient(135deg, rgb(0, 160, 224) 50%, rgb(44, 62, 80) 130%);
+    color: white;
     border: 1px solid #ccc;
     border-radius: 8px;
     cursor: pointer;
@@ -162,11 +163,7 @@ main {
 }
 
 .footer-btn:hover {
-    background: #e9ecef;
-}
-
-.footer-btn.danger {
-    color: #d9534f;
+    background: linear-gradient(135deg, rgb(0, 140, 200) 50%, rgb(40, 55, 70) 130%);
 }
 
 /* ==========================================
@@ -243,7 +240,7 @@ main {
 .player-card {
     position: relative;
     background: #fff;
-    border: 1px solid #ddd;
+    border: 1px solid #000;
     padding: 12px 10px 12px 25px;
     border-radius: 8px;
     font-size: 14px;
@@ -496,7 +493,7 @@ main {
     }
     #sidePanel {
         padding-left: 20px;
-        width: 260px;
+        width: 286px;
         flex-shrink: 0;
     }
     .app-container {
@@ -538,11 +535,11 @@ main {
         width: 100vw;
         overflow: hidden !important;
         padding: 0 !important;
-        gap: 5px;
+        gap: 2px;
     }
     
     #sidePanel {
-        width: 190px;
+        width: 209px;
         height: calc(100vh - 200px) !important;
         overflow: hidden;
         background-color: transparent;
@@ -621,7 +618,7 @@ main {
 
     /* Player Cards Mobile */
     .player-card {
-        width: 160px !important;
+        width: 176px !important;
         font-size: 1rem;
         padding: 15px 10px 15px 30px !important;
     }
@@ -693,11 +690,11 @@ main {
 }
 @media (max-width: 600px) {
     #sidePanel {
-        width: 150px;
+        width: 181px;
     }
 
     .player-card {
-        width: 130px !important;
+        width: 157px !important;
         font-size: 0.9rem;
         padding: 10px 8px 10px 20px !important;
     }
