@@ -539,7 +539,7 @@ main {
     
     #sidePanel {
         width: 209px;
-        height: calc(100vh - 400px) !important;
+        height: calc(100vh - 350px) !important;
         overflow: hidden;
         background-color: transparent;
         border-right: none;
