@@ -33,7 +33,7 @@ body {
 header, #settings {
     width: 50%;
     max-width: 1400px;
-    color: black;
+    color: white;
     margin: 0 auto;
     box-sizing: border-box;
 }
@@ -488,6 +488,10 @@ main {
 header h1 {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     font-weight: 700;
+    background: rgba(0, 160, 240, 0.5);
+    padding: 8px 16px;
+    border-radius: 6px;
+    display: inline-block;
 }
 
 /* Ensure desktop width remains 50% */
