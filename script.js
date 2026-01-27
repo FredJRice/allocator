@@ -44,10 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
           2. Tap on a player to add them or select 'Add all'
           3. Click a court to auto add or drag player to the court
           
-          Click '×' on a player to remove them
-          Click 'Clear All' to reset
-          Timers start/stop automatically
-          Copyright © 2026 Court Queue - Fred Rice`);
+          Copyright © 2026 Court Queue - Fred Rice
+          Version 1.0.0 | Updated January 2026`);
     };
 
     // 3. Clear All
