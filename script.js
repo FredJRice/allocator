@@ -341,14 +341,6 @@ function renderQueue() {
     if (!container) return;
     container.innerHTML = '';
 
-    if (queue.length === 0) {
-        const label = document.createElement('div');
-        label.className = 'instruction-text';
-        label.style.margin = 'auto';
-        label.innerText = 'Player Queue';
-        container.appendChild(label);
-    }
-
     queue.forEach((player, index) => {
         const div = createPlayerCard(player.name);
         div.querySelector('.delete-btn').addEventListener('click', (e) => {

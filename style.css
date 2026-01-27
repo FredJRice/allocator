@@ -8,6 +8,10 @@
     --delete-red: #ff4757;
     --free-green: #2ecc71;
     --timer-bg: #333333;
+    --bg-image: linear-gradient(rgba(255, 255, 255, 0.75), rgba(18,18,18, 0.75)), url('40099290-41C7-4A42-A624-1A0257433F24.jpeg');
+    --bg-image-light: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), url('40099290-41C7-4A42-A624-1A0257433F24.jpeg');
+    --primary-gradient: linear-gradient(135deg, rgb(0, 160, 224) 50%, rgb(44, 62, 80) 130%);
+    --primary-gradient-hover: linear-gradient(135deg, rgb(0, 140, 200) 50%, rgb(40, 55, 70) 130%);
 }
 
 /* ==========================================
@@ -25,49 +29,34 @@ html, body {
 body {
     display: flex;
     flex-direction: column;
+    align-items: initial;
+}
+
+app-main {
+    height: calc(100vh - 20px);
+    width: 50vw;
+    max-width: 1400px;
+    background-image: var(--bg-image);
+    background-size: cover;
+    margin: 10px auto;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 /* ==========================================
    3. HEADER & SETTINGS
    ========================================== */
-header, #settings {
-    width: 50%;
-    max-width: 1400px;
-    color: white;
-    margin: 0 auto;
-    box-sizing: border-box;
-}
+
 
 header {
-    background-image: linear-gradient(rgba(255, 255, 255, 0.75), rgba(18,18,18, 0.75)),url('40099290-41C7-4A42-A624-1A0257433F24.jpeg');
-    background-size: cover;
-    background-position: center;
-    backdrop-filter: blur(10px);
     text-align: center;
-    margin: 0;
     padding: 8px;
     border-bottom: 1px solid #ddd;
     flex-shrink: 0;
-    width: 100%; /* Default to full width for mobile */
     box-sizing: border-box;
 }
 
-#settings {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    align-items: center;
-    background: white;
-    padding: 10px;
-    border-radius: 0 0 8px 8px;
-    border-bottom: 1px solid #ddd;
-    flex-shrink: 0;
-}
-
-#settings input {
-    width: 50px;
-    padding: 5px;
-}
 
 /* ==========================================
    4. MAIN LAYOUT & SIDEBAR (QUEUE)
@@ -75,15 +64,14 @@ header {
 main {
     display: grid;
     grid-template-columns: 340px 1fr; 
-    background-image: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)),url('40099290-41C7-4A42-A624-1A0257433F24.jpeg');
-    background-size: cover;
-    background-position: center;
-    width: 50%;
-    max-width: 1400px;
-    margin: 0 auto;
+    /* background-image: var(--bg-image-light); */
+    /* background-size: cover;
+    background-position: center; */
+    width: 100%;
     gap: 10px;
     padding: 10px 0;
-    height: calc(100vh - 200px);
+    flex: 1 1 auto;
+    min-height: 0;
     overflow: hidden;
     align-items: stretch;
 }
@@ -100,27 +88,41 @@ main {
     flex-direction: column;
     background: transparent;
     padding: 0px;            
-    height: auto;        /* Let the children define the height */
-    min-height: 0;       /* REMOVE the 580px */
+    height: 90%;
+    min-height: 0;
     box-sizing: border-box;
 }
 
 .header-with-action {
     display: flex;
-    justify-content: flex-end; 
+    flex-direction: column;
+    justify-content: center; 
     align-items: center;
     margin-bottom: 10px;
 }
 
+.header-with-action h2 {
+    margin: 0 0 10px 0;
+    text-align: center;
+    width: 100%;
+    font-size: 1.5rem;
+    color: var(--accent-color);
+}
+
 .queue-container {
-    height: calc(100vh - 260px) !important;
-    overflow-y: auto;          /* Scroll inside this height */
+    width: 100%;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-wrap: wrap;       /* Allow wrapping if needed, but direction is crucial */
+    flex-direction: row;   /* Changed to row so players tile horizontally or wrap */
+    justify-content: center;
+    overflow-y: auto;
     border: 2px solid black; 
     border-radius: 8px;
     background: #fafafa;
     padding: 15px;
-    display: flex;
-    flex-wrap: wrap;
     align-content: flex-start;
     gap: 15px;
     position: relative;
@@ -128,16 +130,14 @@ main {
 }
 
 .main-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
     width: 100%;
-    background-image: linear-gradient(rgba(255, 255, 255, 0.75), rgba(18,18,18, 0.75)),url('40099290-41C7-4A42-A624-1A0257433F24.jpeg');
+    /* background-image: var(--bg-image); */
     background-size: cover;
     background-position: center;
-    /* background: rgb(240, 242, 245); */
     border-top: 1px solid #ddd;
-    padding: 11px 0;    padding-bottom: env(safe-area-inset-bottom, 10px);    z-index: 1000; /* Ensures it stays above other elements */
+    padding: 11px 0;
+    padding-bottom: calc(15px + env(safe-area-inset-bottom, 0px));
+    z-index: 1000;
     box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
 }
 
@@ -154,7 +154,7 @@ main {
     flex: 1;
     max-width: 200px;
     height: 45px;
-    background: linear-gradient(135deg, rgb(0, 160, 224) 50%, rgb(44, 62, 80) 130%);
+    background: var(--primary-gradient);
     color: white;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -168,7 +168,7 @@ main {
 }
 
 .footer-btn:hover {
-    background: linear-gradient(135deg, rgb(0, 140, 200) 50%, rgb(40, 55, 70) 130%);
+    background: var(--primary-gradient-hover);
 }
 
 /* ==========================================
@@ -176,12 +176,13 @@ main {
    ========================================== */
 .court-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+    grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: min-content !important;
     gap: 20px;
-    justify-content: center;
-    height: calc(100vh - 185px);
-    overflow-y: auto; 
+    justify-content: stretch;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
     padding-right: 10px;
     padding-bottom: 100px;
     box-sizing: border-box;
@@ -193,7 +194,8 @@ main {
     border: 2px solid var(--accent-color);
     border-radius: 12px;
     padding: 15px;
-    width: 280px;
+    width: 100%;
+    min-width: 0;
     height: auto;
     min-height: 280px;
     display: flex;
@@ -271,10 +273,11 @@ main {
 }
 
 .court .player-card {
-    margin: 0; 
-    width: 180px;
+    margin: 0 auto; 
+    width: 95%;
     text-align: center;
     padding-left: 10px;
+    box-sizing: border-box;
 }
 
 .drag-ghost {
@@ -305,11 +308,11 @@ main {
 
 
 .plus-btn {
-     width: 100% !important;
-    height: 55px !important;    /* Forces an exact match */
-    background: linear-gradient(135deg, rgb(0, 160, 224) 50%, rgb(44, 62, 80) 130%);
+    width: 100% !important;
+    height: 55px !important;
+    background: var(--primary-gradient);
     color: white;
-    padding: 0;                 /* Removes padding conflicts */
+    padding: 0;
     border: none;
     border-radius: 8px;
     font-size: 1.1rem;
@@ -325,8 +328,8 @@ main {
     position: absolute;
     top: -8px; /* Slightly higher up */
     left: -8px; /* Slightly further out */
-    width: 22px !important; /* Fixed size */
-    height: 22px !important;
+    width: 26px !important; /* Fixed size */
+    height: 26px !important;
     background-color: #ff4757 !important; /* Solid Red */
     color: white !important;
     border: 2px solid black  !important; /* Makes it look clean */
@@ -400,19 +403,15 @@ main {
 }
 
 #playerDatabase {
-    flex: 1; /* Makes the middle section grow/shrink to keep buttons on screen */
-    overflow-y: auto; /* Adds the scrollbar here, inside the modal */
+    flex: 1;
+    overflow-y: auto;
     border: 1px solid #eee;
     padding: 10px;
     margin-top: 10px;
-    
-    /* GRID LOGIC FOR SIDE-BY-SIDE CARDS */
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Three equal columns */
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     align-items: start;
-    flex: 1;
-    overflow-y: auto;
 }
 
 /* Ensures the player cards inside the modal don't look squashed */
@@ -424,14 +423,13 @@ main {
     justify-content: center;
 }
 
-/* Create a shared style for all "Full Width" modal buttons */
 .create-player-btn-long, 
 #saveToPoolBtn, #cancelAddPlayerBtn {
     width: 100% !important;
-    height: 55px !important;    /* Forces an exact match */
-    background: linear-gradient(135deg, rgb(0, 160, 224) 50%, rgb(44, 62, 80) 130%);
+    height: 55px !important;
+    background: var(--primary-gradient);
     color: white;
-    padding: 0;                 /* Removes padding conflicts */
+    padding: 0;
     border: none;
     border-radius: 8px;
     font-size: 1.1rem;
@@ -450,7 +448,7 @@ main {
 }
 
 .add-all-btn, .close-pool-btn {
-    flex: 1;         /* Makes both buttons the same width */
+    flex: 1;
     height: 50px;
     border: none;
     border-radius: 8px;
@@ -459,12 +457,12 @@ main {
 }
 
 .add-all-btn {
-    background: linear-gradient(135deg, rgb(0, 160, 224) 50%, rgb(44, 62, 80) 130%);
+    background: var(--primary-gradient);
     color: white;
 }
 
 .close-pool-btn {
-    background: linear-gradient(135deg, rgb(0, 160, 224) 50%, rgb(44, 62, 80) 130%);
+    background: var(--primary-gradient);
     color: white;
 }
 
@@ -486,9 +484,9 @@ main {
 }
 
 header h1 {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
     font-weight: 700;
-    background: rgba(0, 160, 240, 0.5);
+    /* background: rgba(0, 160, 240, 0.5); */
     padding: 8px 16px;
     border-radius: 6px;
     display: inline-block;
@@ -496,30 +494,27 @@ header h1 {
 
 /* Ensure desktop width remains 50% */
 @media (min-width: 1025px) {
+    /* Since these are inside app-main (which is 50vw), they should fill it */
     header, #settings, main {
-        width: 50% !important;
+        width: 100% !important;
     }
     header {
-        margin: 0 auto !important;
+        margin: 0 !important;
     }
     main {
-        margin: 0 auto !important;
+        margin: 0 !important; 
     }
     #sidePanel {
         padding-left: 20px;
         width: 286px;
         flex-shrink: 0;
     }
-    .app-container {
+    .app-main {
         width: 100%;
         height: 100%;
     }
     #courtGrid {
         flex: 1;
-    }
-    .main-footer {
-        left: 25%;
-        width: 50%;
     }
 }
 
@@ -528,6 +523,10 @@ header h1 {
    8. MEDIA QUERIES (TABLET & MOBILE)
    ========================================== */
 @media (max-width: 1024px) {
+    app-main {
+        width: 100vw !important;
+    }
+
     header {
         width: 100% !important;
         margin: 0 !important;
@@ -535,18 +534,15 @@ header h1 {
         padding-top: env(safe-area-inset-top, 20px) !important;
     }
 
-    .app-container {
+    .app-main {
+        display: flex !important;
+        flex-direction: row !important;
+        flex: 1 1 auto !important;
+        height: auto !important;
+        min-height: 0 !important;
         width: 100% !important;
         margin: 0 !important;
         border-radius: 0 !important;
-        padding-top: 0 !important; /* Remove safe-area padding here */
-    }
-
-    .app-container {
-        display: flex !important;
-        flex-direction: row !important;
-        height: 100dvh !important; 
-        width: 100vw;
         overflow: hidden !important;
         padding: 0 !important;
         gap: 2px;
@@ -586,7 +582,7 @@ header h1 {
         border-radius: 8px !important;
         font-size: 1.4rem !important;
         font-weight: bold;
-        background-color: rgb(0, 160, 224) !important;
+        background: var(--primary-gradient) !important;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -641,9 +637,9 @@ header h1 {
     }
 
     .delete-btn {
-        width: 32px !important;
-        height: 32px !important;
-        left: -12px !important;
+        width: 24px !important;
+        height: 24px !important;
+        left: -8px !important;
     }
 
     /* Modal Mobile */
@@ -660,17 +656,13 @@ header h1 {
 }
 
     #playerDatabase {
-        /* This tells the list of names to take all available space 
-        and then stop, forcing a scrollbar within the modal */
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        overflow-y: auto;
-        border: 1px solid #eee;
-        gap:15px;
+        gap: 15px;
         padding: 15px;
         margin-top: 10px;
-        min-height: 0; 
-}
+        min-height: 0;
+    }
      #addPlayerModalContent {
         width: 90% !important;
         max-width: none;
