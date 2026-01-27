@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
           Click '×' on a player to remove them
           Click 'Clear All' to reset
           Timers start/stop automatically
-          Copyright © 2024 Court Queue - Fred Rice`);
+          Copyright © 2026 Court Queue - Fred Rice`);
     };
 
     // 3. Clear All
