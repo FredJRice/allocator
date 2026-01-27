@@ -33,13 +33,14 @@ body {
 header, #settings {
     width: 50%;
     max-width: 1400px;
-    color: white;
+    color: black;
     margin: 0 auto;
     box-sizing: border-box;
 }
 
 header {
-    background: linear-gradient(135deg, rgb(0, 160, 224) 50%, rgb(38, 39, 96) 130%);
+    background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)),url('40099290-41C7-4A42-A624-1A0257433F24.jpeg');
+    backdrop-filter: blur(10px);
     text-align: center;
     margin: 0;
     padding: 8px;
@@ -477,6 +478,11 @@ main {
     text-align: center;
     font-style: italic;
     pointer-events: none;
+}
+
+header h1 {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    font-weight: 700;
 }
 
 /* Ensure desktop width remains 50% */
