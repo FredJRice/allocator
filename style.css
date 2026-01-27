@@ -131,7 +131,7 @@ main {
     width: 100%;
     background: #737678;
     border-top: 1px solid #ddd;
-    padding: 10px 0;    padding-bottom: env(safe-area-inset-bottom, 10px);    z-index: 1000; /* Ensures it stays above other elements */
+    padding: 11px 0;    padding-bottom: env(safe-area-inset-bottom, 10px);    z-index: 1000; /* Ensures it stays above other elements */
     box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
 }
 
