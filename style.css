@@ -110,7 +110,7 @@ main {
 }
 
 .queue-container {
-    height: calc(100vh - 350px) !important;
+    height: calc(100vh - 260px) !important;
     overflow-y: auto;          /* Scroll inside this height */
     border: 2px solid black; 
     border-radius: 8px;
@@ -174,7 +174,7 @@ main {
     grid-auto-rows: min-content !important;
     gap: 20px;
     justify-content: center;
-    height: calc(100vh - 200px);
+    height: calc(100vh - 185px);
     overflow-y: auto; 
     padding-right: 10px;
     padding-bottom: 100px;
@@ -520,7 +520,7 @@ main {
         padding-top: env(safe-area-inset-top, 20px) !important;
     }
 
-    #settings, .app-container {
+    .app-container {
         width: 100% !important;
         margin: 0 !important;
         border-radius: 0 !important;
@@ -539,7 +539,7 @@ main {
     
     #sidePanel {
         width: 209px;
-        height: calc(100vh - 200px) !important;
+        height: calc(100vh - 350px) !important;
         overflow: hidden;
         background-color: transparent;
         border-right: none;
@@ -586,7 +586,7 @@ main {
     }
 
     .queue-container {
-        height: calc(100% - 150px) !important;
+        height: calc(100% - 0px) !important;
     }
 
     /* Court Grid Mobile */
@@ -704,6 +704,6 @@ main {
     }
 
     .queue-container {
-        height: calc(100% - 10px) !important;
+        height: calc(100% - 0px) !important;
     }
 }
