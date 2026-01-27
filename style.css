@@ -539,7 +539,7 @@ main {
     
     #sidePanel {
         width: 209px;
-        height: calc(100vh - 350px) !important;
+        height: calc(100vh - 200px) !important;
         overflow: hidden;
         background-color: transparent;
         border-right: none;
@@ -583,10 +583,6 @@ main {
         min-height: auto !important;
         height: 100%;
         padding: 5px;
-    }
-
-    .queue-container {
-        height: calc(100% - 0px) !important;
     }
 
     /* Court Grid Mobile */
