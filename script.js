@@ -15,6 +15,7 @@ if (players.length === 0) {
 let queue = [];
 let timers = {};
 let config = { count: 4 };
+let courtNames = JSON.parse(localStorage.getItem('courtNames')) || [];
 let focusedCourtId = null;
 let activeGhost = null;
 
@@ -98,7 +99,7 @@ function generateCourts() {
         court.className = 'court';
         court.id = `court-${i}`; 
         court.innerHTML = `
-            <h3>Court ${i}</h3>
+            <h3 class="court-name" data-court="${i}">${courtNames[i-1] || `Court ${i}`}</h3>
             <div class="slots-container" id="slots-${i}">
                 <div class="status-box">
                     <span class="free-label">Free</span>
@@ -117,6 +118,43 @@ function generateCourts() {
         court.ondragover = (e) => e.preventDefault();
         court.ondrop = (e) => handleDropToCourt(e, i);
         grid.appendChild(court);
+
+        // Add rename functionality
+        const h3 = court.querySelector('.court-name');
+        h3.addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.value = h3.textContent;
+            input.style.width = '100%';
+            input.style.fontSize = '1.2em';
+            input.style.border = 'none';
+            input.style.background = 'transparent';
+            h3.replaceWith(input);
+            input.focus();
+            input.select();
+            input.addEventListener('blur', () => {
+                const newName = input.value.trim() || `Court ${i}`;
+                courtNames[i-1] = newName;
+                localStorage.setItem('courtNames', JSON.stringify(courtNames));
+                const newH3 = document.createElement('h3');
+                newH3.className = 'court-name';
+                newH3.setAttribute('data-court', i);
+                newH3.textContent = newName;
+                input.replaceWith(newH3);
+                // Re-add listener
+                newH3.addEventListener('click', arguments.callee);
+            });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') input.blur();
+                if (e.key === 'Escape') {
+                    const newH3 = document.createElement('h3');
+                    newH3.className = 'court-name';
+                    newH3.setAttribute('data-court', i);
+                    newH3.textContent = h3.textContent;
+                    input.replaceWith(newH3);
+                    newH3.addEventListener('click', arguments.callee);
+                }
+            });
+        });
     }
 }
 

@@ -110,7 +110,7 @@ main {
 }
 
 .queue-container {
-    height: calc(100vh - 200px) !important;
+    height: calc(100vh - 300px) !important;
     overflow-y: auto;          /* Scroll inside this height */
     border: 2px solid black; 
     border-radius: 8px;
@@ -174,7 +174,7 @@ main {
    ========================================== */
 .court-grid {
     display: grid;
-    grid-template-columns: repeat(2, 280px); 
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
     grid-auto-rows: min-content !important;
     gap: 20px;
     justify-content: center;
@@ -488,6 +488,28 @@ main {
     header, #settings, main {
         width: 50% !important;
     }
+    header {
+        margin: 0 auto !important;
+    }
+    main {
+        margin: 0 auto !important;
+    }
+    #sidePanel {
+        padding-left: 20px;
+        width: 260px;
+        flex-shrink: 0;
+    }
+    .app-container {
+        width: 100%;
+        height: 100%;
+    }
+    #courtGrid {
+        flex: 1;
+    }
+    .main-footer {
+        left: 25%;
+        width: 50%;
+    }
 }
 
 
@@ -499,7 +521,7 @@ main {
         width: 100% !important;
         margin: 0 !important;
         border-radius: 0 !important;
-        padding-top: env(safe-area-inset-top, 20px) !important;
+        padding-top: 0 !important;
     }
 
     #settings, .app-container {
@@ -565,6 +587,10 @@ main {
         min-height: auto !important;
         height: 100%;
         padding: 5px;
+    }
+
+    .queue-container {
+        height: calc(100% - 150px) !important;
     }
 
     /* Court Grid Mobile */
@@ -679,5 +705,9 @@ main {
     .court .player-card {
         width: 90% !important; 
         max-width: 180px;
+    }
+
+    .queue-container {
+        height: calc(100% - 10px) !important;
     }
 }
