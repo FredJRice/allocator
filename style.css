@@ -39,7 +39,9 @@ header, #settings {
 }
 
 header {
-    background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)),url('40099290-41C7-4A42-A624-1A0257433F24.jpeg');
+    background-image: linear-gradient(rgba(255, 255, 255, 0.75), rgba(18,18,18, 0.75)),url('40099290-41C7-4A42-A624-1A0257433F24.jpeg');
+    background-size: cover;
+    background-position: center;
     backdrop-filter: blur(10px);
     text-align: center;
     margin: 0;
