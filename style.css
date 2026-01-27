@@ -110,7 +110,7 @@ main {
 }
 
 .queue-container {
-    height: calc(100vh - 300px) !important;
+    height: calc(100vh - 350px) !important;
     overflow-y: auto;          /* Scroll inside this height */
     border: 2px solid black; 
     border-radius: 8px;
