@@ -34,6 +34,7 @@ body {
 
 app-main {
     height: calc(100vh - 20px);
+    height: calc(100dvh - 20px);
     width: 50vw;
     max-width: 1400px;
     background-image: var(--bg-image);
@@ -246,7 +247,7 @@ main {
    ========================================== */
 .player-card {
     position: relative;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.95);
     border: 1px solid #000;
     padding: 12px 10px 12px 25px;
     border-radius: 8px;
@@ -551,6 +552,7 @@ header h1 {
     #sidePanel {
         width: 209px;
         height: calc(100vh - 250px) !important;
+        height: calc(100dvh - 250px) !important;
         overflow: hidden;
         background-color: transparent;
         border-right: none;
@@ -600,6 +602,7 @@ header h1 {
     #courtGrid {
         flex-grow: 1;
         height: calc(100vh - 200px) !important;
+        height: calc(100dvh - 200px) !important;
         overflow-y: auto !important;
         display: block !important; 
         -webkit-overflow-scrolling: touch;
@@ -646,7 +649,8 @@ header h1 {
     .pool-modal-content {
     width: 95% !important;
     max-width: 600px;
-    /* Changed from 85vh to a safe calculation */
+    /* Changed from 85vh to a safe calculat
+    height: calc(100dvh - 200px) !important;ion */
     height: calc(100vh - 200px) !important; 
     display: flex;
     flex-direction: column;
