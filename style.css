@@ -33,13 +33,13 @@ body {
 }
 
 app-main {
-    height: calc(100vh - 20px);
-    height: calc(100dvh - 20px);
+    height: 100vh;
+    height: 100dvh;
     width: 50vw;
     max-width: 1400px;
     background-image: var(--bg-image);
     background-size: cover;
-    margin: 10px auto;
+    margin: 0 auto;
     padding: 0;
     display: flex;
     flex-direction: column;

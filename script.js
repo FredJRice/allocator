@@ -71,6 +71,7 @@ function createPlayerCard(name, courtId = null) {
     const btn = document.createElement('button');
     btn.className = 'delete-btn';
     btn.innerText = '×';
+    btn.addEventListener('pointerdown', (e) => e.stopPropagation());
     
     if (courtId) {
         btn.addEventListener('click', (e) => removeSingleFromCourt(e, courtId, div));
@@ -79,7 +80,7 @@ function createPlayerCard(name, courtId = null) {
             e.dataTransfer.setData("fromCourt", courtId);
         };
     } else {
-        div.addEventListener('click', () => handleSidebarPlayerClick(name));
+        // div.addEventListener('click', () => handleSidebarPlayerClick(name)); REMOVED to prevent double fire
     }
     
     div.appendChild(btn);
@@ -235,70 +236,192 @@ function handleSidebarPlayerClick(name) {
 
 // --- Universal Drag & Drop ---
 
+function reorderQueue(fromIndex, toIndex) {
+    if (fromIndex === toIndex) return;
+    if (fromIndex < 0 || fromIndex >= queue.length) return;
+    
+    // Remove the item from its old position
+    const [movedItem] = queue.splice(fromIndex, 1);
+    
+    // If we're dropping *after* the original position, the indices shifted down by 1.
+    // However, splice handles "insert at X" logic cleanly if we account for that shift
+    // or if we just want "insert before X".
+    
+    // Generally for drag and drop:
+    // If I drag item 0 to item 2 (which becomes index 1 after removal), I want it at index 1? NO.
+    // [A, B, C] -> Drag A to C.
+    // Remove A -> [B, C]. C is at 1.
+    // Insert at 1 -> [B, A, C].
+    // Wait, usually drag to C means insert BEFORE C.
+    
+    // If dragging DOWN (0 -> 2), target is C (index 2 originally).
+    // Remove A (0). [B, C]. C is at index 1.
+    // Target index was 2. Now 1.
+    // Queue.splice(1, 0, A) -> [B, A, C]. Correct.
+    
+    // If dragging UP (2 -> 0). Target A (index 0).
+    // Remove C (2). [A, B].
+    // Target A is still at index 0.
+    // Queue.splice(0, 0, C) -> [C, A, B]. Correct.
+    
+    // So if from < to, we insert at (to - 1).
+    // If from > to, we insert at (to).
+    
+    let insertAt = toIndex;
+    if (fromIndex < toIndex) {
+        insertAt = toIndex - 1;
+    }
+    
+    // Safety check just in case
+    if (insertAt < 0) insertAt = 0;
+    if (insertAt > queue.length) insertAt = queue.length;
+
+    queue.splice(insertAt, 0, movedItem);
+    renderQueue();
+}
+
+let isDraggingGlobal = false;
+
 function initTouchDrag(e, index, originalElement) {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (isDraggingGlobal) return;
 
-    // 1. Create and Style the Ghost
-    activeGhost = originalElement.cloneNode(true);
-    activeGhost.classList.add('drag-ghost');
+    const startX = e.clientX;
+    const startY = e.clientY;
     
-    // Ensure the ghost is visible and floating
-    Object.assign(activeGhost.style, {
-        position: 'fixed',
-        pointerEvents: 'none', // Critical: prevents ghost from blocking drop targets
-        zIndex: '9999',
-        opacity: '0.8',
-        left: '0px',
-        top: '0px'
-    });
+    let dragTimer = null;
+    let localIsDragging = false;
+    let activeGhost = null;
 
-    document.body.appendChild(activeGhost);
-    
-    const moveAt = (x, y) => {
-        if (!activeGhost) return;
-        // Center the ghost under the finger/cursor
-        activeGhost.style.left = `${x - (activeGhost.offsetWidth / 2)}px`;
-        activeGhost.style.top = `${y - (activeGhost.offsetHeight / 2)}px`;
+    // Feedback: User has touched
+    originalElement.style.transform = "scale(0.98)";
+    originalElement.style.transition = "transform 0.1s";
 
-        // Visual feedback for hovering over a court
-        const hoverTarget = document.elementFromPoint(x, y)?.closest('.court');
-        document.querySelectorAll('.court').forEach(c => c.classList.remove('court-drag-over'));
-        if (hoverTarget) hoverTarget.classList.add('court-drag-over');
+    const startDrag = () => {
+        localIsDragging = true;
+        isDraggingGlobal = true;
+        
+        // Haptic feedback
+        if (navigator.vibrate) navigator.vibrate(50);
+        
+        // Visuals
+        originalElement.style.transform = "scale(1)";
+        originalElement.style.opacity = "0.4";
+        
+        // Create Ghost
+        activeGhost = originalElement.cloneNode(true);
+        activeGhost.classList.add('drag-ghost');
+        // Reset styles on ghost that might have been copied
+        activeGhost.style.transform = "scale(1.05)";
+        activeGhost.style.opacity = "0.9";
+        activeGhost.style.position = 'fixed';
+        activeGhost.style.zIndex = '9999';
+        activeGhost.style.pointerEvents = 'none';
+        activeGhost.style.width = `${originalElement.offsetWidth}px`;
+        
+        document.body.appendChild(activeGhost);
+        
+        // Initial position
+        updateGhostPosition(startX, startY);
     };
 
-    moveAt(e.clientX, e.clientY);
+    const updateGhostPosition = (x, y) => {
+        if (!activeGhost) return;
+        activeGhost.style.left = `${x - (originalElement.offsetWidth / 2)}px`;
+        activeGhost.style.top = `${y - (originalElement.offsetHeight / 2)}px`;
+        
+        // Highlight logic
+        document.querySelectorAll('.court').forEach(c => c.classList.remove('court-drag-over'));
+        const hoverElement = document.elementFromPoint(x, y);
+        const court = hoverElement?.closest('.court');
+        if (court) court.classList.add('court-drag-over');
+    };
 
-    const onPointerMove = (ev) => moveAt(ev.clientX, ev.clientY);
+    const onPointerMove = (ev) => {
+        if (!localIsDragging) {
+            // Check for movement threshold to CANCEL drag timer (assumed scroll)
+            const moveX = Math.abs(ev.clientX - startX);
+            const moveY = Math.abs(ev.clientY - startY);
+            if (moveX > 10 || moveY > 10) {
+                clearTimeout(dragTimer);
+                cleanupListeners();
+            }
+        } else {
+            if (ev.cancelable) ev.preventDefault(); // Prevent scrolling
+            updateGhostPosition(ev.clientX, ev.clientY);
+        }
+    };
 
     const onPointerUp = (ev) => {
-        const dropTarget = document.elementFromPoint(ev.clientX, ev.clientY)?.closest('.court');
+        clearTimeout(dragTimer);
         
-        if (dropTarget) {
-            const courtId = dropTarget.id.split('-')[1];
-            handleDropToCourt(null, courtId, index); 
-        }
-
-        // 2. THE IMPROVED CLEANUP (The iPhone Fix)
-        // We use a tiny timeout to ensure the browser processes the drop before deleting the UI
-        setTimeout(() => {
-            if (activeGhost) {
-                activeGhost.remove();
-                activeGhost = null;
+        if (localIsDragging) {
+            processDrop(ev.clientX, ev.clientY);
+        } else {
+            // It was a click/tap
+            if (Math.abs(ev.clientX - startX) < 10 && Math.abs(ev.clientY - startY) < 10) {
+                // Manually trigger click if we prevented default? 
+                // We didn't prevent default on pointerdown, so native click should fire.
+                // But just in case we need to trigger the card click logic:
+                 const name = originalElement.getAttribute('data-name');
+                 if (name && !ev.target.closest('.delete-btn')) {
+                     handleSidebarPlayerClick(name);
+                 }
             }
-
-            // Nuclear Option: Delete any stray ghosts that might have been left behind
-            document.querySelectorAll('.drag-ghost, .dnd-poly-drag-image').forEach(el => el.remove());
-            
-            // Clear all hover highlights
-            document.querySelectorAll('.court').forEach(c => c.classList.remove('court-drag-over'));
-        }, 10);
-
-        window.removeEventListener('pointermove', onPointerMove);
-        window.removeEventListener('pointerup', onPointerUp);
+        }
+        
+        cleanupListeners();
+    };
+    
+    const onPointerCancel = () => {
+        clearTimeout(dragTimer);
+        cleanupListeners();
     };
 
-    window.addEventListener('pointermove', onPointerMove);
+    const cleanupListeners = () => {
+        isDraggingGlobal = false;
+        if (activeGhost) activeGhost.remove();
+        activeGhost = null;
+        
+        // Reset Original
+        originalElement.style.transform = "";
+        originalElement.style.opacity = "";
+        originalElement.style.transition = "";
+
+        // Remove Hover classes
+        document.querySelectorAll('.court').forEach(c => c.classList.remove('court-drag-over'));
+        
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
+        window.removeEventListener('pointercancel', onPointerCancel);
+    };
+
+    const processDrop = (x, y) => {
+        const pointElement = document.elementFromPoint(x, y);
+        const dropCourt = pointElement?.closest('.court');
+        const dropCard = pointElement?.closest('.queue-container .player-card');
+        const dropQueue = pointElement?.closest('.queue-container');
+        
+        if (dropCourt) {
+            const courtId = dropCourt.id.split('-')[1];
+            handleDropToCourt(null, courtId, index); 
+        } else if (dropCard) {
+            const targetName = dropCard.getAttribute('data-name');
+            const targetIndex = queue.findIndex(p => p.name === targetName);
+            if (targetIndex !== -1) {
+                reorderQueue(index, targetIndex);
+            }
+        } else if (dropQueue) {
+            reorderQueue(index, queue.length);
+        }
+    };
+
+    // START TIMER: 300ms hold to pick up
+    dragTimer = setTimeout(startDrag, 300);
+
+    window.addEventListener('pointermove', onPointerMove, { passive: false });
     window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerCancel);
 }
 function handleDropToCourt(e, courtId, manualIndex = null) {
     if (e) e.preventDefault();
@@ -340,6 +463,27 @@ function renderQueue() {
     const container = document.getElementById('playerQueue');
     if (!container) return;
     container.innerHTML = '';
+
+    // Enable Reordering via Native Drag & Drop (Desktop)
+    container.ondragover = (e) => e.preventDefault();
+    container.ondrop = (e) => {
+        e.preventDefault();
+        const srcIdxVal = e.dataTransfer.getData("queueIndex");
+        if (srcIdxVal) {
+            const srcIdx = parseInt(srcIdxVal);
+            const targetCard = e.target.closest('.player-card');
+            
+            // Insert before the dropped-on card, or at end if dropped in empty space
+            let targetIdx = queue.length; 
+            if (targetCard) {
+                const name = targetCard.getAttribute('data-name');
+                const idx = queue.findIndex(p => p.name === name);
+                if (idx !== -1) targetIdx = idx;
+            }
+            
+            reorderQueue(srcIdx, targetIdx);
+        }
+    };
 
     queue.forEach((player, index) => {
         const div = createPlayerCard(player.name);
