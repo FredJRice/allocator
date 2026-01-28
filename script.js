@@ -121,7 +121,7 @@ function generateCourts() {
         `;
         
         court.addEventListener('click', (e) => { 
-            if (!e.target.closest('.player-card') && !e.target.closest('.delete-btn')) {
+            if (!e.target.closest('.player-card') && !e.target.closest('.delete-btn') && !e.target.closest('.court-name')) {
                 handleCourtClick(i); 
             }
         });
@@ -132,40 +132,54 @@ function generateCourts() {
 
         // Add rename functionality
         const h3 = court.querySelector('.court-name');
-        h3.addEventListener('click', () => {
-            const input = document.createElement('input');
-            input.value = h3.textContent;
-            input.style.width = '100%';
-            input.style.fontSize = '1.2em';
-            input.style.border = 'none';
-            input.style.background = 'transparent';
-            h3.replaceWith(input);
-            input.focus();
-            input.select();
-            input.addEventListener('blur', () => {
-                const newName = input.value.trim() || `Court ${i}`;
-                courtNames[i-1] = newName;
-                localStorage.setItem('courtNames', JSON.stringify(courtNames));
-                const newH3 = document.createElement('h3');
-                newH3.className = 'court-name';
-                newH3.setAttribute('data-court', i);
-                newH3.textContent = newName;
-                input.replaceWith(newH3);
-                // Re-add listener
-                newH3.addEventListener('click', arguments.callee);
-            });
-            input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') input.blur();
-                if (e.key === 'Escape') {
+        
+        const setupRename = (element) => {
+            element.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                const currentText = element.textContent;
+                const input = document.createElement('input');
+                input.value = currentText;
+                input.style.width = '100%';
+                input.style.fontSize = '1.2em';
+                input.style.border = 'none';
+                input.style.background = 'transparent';
+                
+                element.replaceWith(input);
+                input.focus();
+                input.select();
+                
+                const restore = (name) => {
                     const newH3 = document.createElement('h3');
                     newH3.className = 'court-name';
                     newH3.setAttribute('data-court', i);
-                    newH3.textContent = h3.textContent;
-                    input.replaceWith(newH3);
-                    newH3.addEventListener('click', arguments.callee);
-                }
+                    newH3.textContent = name;
+                    setupRename(newH3);
+                    if (input.parentNode) input.replaceWith(newH3);
+                };
+
+                input.addEventListener('blur', () => {
+                    const newName = input.value.trim() || `Court ${i}`;
+                    courtNames[i-1] = newName;
+                    localStorage.setItem('courtNames', JSON.stringify(courtNames));
+                    restore(newName);
+                });
+                
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') input.blur(); // Triggers blur which saves
+                    if (e.key === 'Escape') {
+                        // Prevent blur from saving if escape is pressed (need to manage state or just overwrite)
+                        // Actually, blur handles save. Escape should cancel.
+                        // We need to remove the blur listener OR handle it.
+                        // Easiest: Let's make restore handle everything and prevent double restore.
+                        // But standard pattern:
+                        input.value = currentText; // Reset value so blur saves original
+                        input.blur();
+                    }
+                });
             });
-        });
+        };
+        
+        setupRename(h3);
     }
 }
 
