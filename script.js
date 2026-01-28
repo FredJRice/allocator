@@ -292,6 +292,8 @@ function initTouchDrag(e, index, originalElement) {
     let dragTimer = null;
     let localIsDragging = false;
     let activeGhost = null;
+    let placeholder = null;
+    let hasMovedPlaceholder = false;
 
     // Feedback: User has touched
     originalElement.style.transform = "scale(0.98)";
@@ -304,20 +306,30 @@ function initTouchDrag(e, index, originalElement) {
         // Haptic feedback
         if (navigator.vibrate) navigator.vibrate(50);
         
-        // Visuals
-        originalElement.style.transform = "scale(1)";
-        originalElement.style.opacity = "0.4";
-        
-        // Create Ghost
+        // 1. Setup Placeholder
+        placeholder = document.createElement('div');
+        placeholder.className = 'queue-placeholder';
+        placeholder.style.width = getComputedStyle(originalElement).width;
+        placeholder.style.height = getComputedStyle(originalElement).height;
+        // Insert placeholder where the original element is
+        originalElement.parentNode.insertBefore(placeholder, originalElement);
+
+        // 2. Hide Original (but keep in DOM for now to maintain indices if needed, though we rely on placeholder for new index)
+        originalElement.style.display = 'none';
+
+        // 3. Create Ghost
         activeGhost = originalElement.cloneNode(true);
+        activeGhost.style.display = 'block'; // Ensure it's visible since original is hidden
         activeGhost.classList.add('drag-ghost');
-        // Reset styles on ghost that might have been copied
+        
+        // Reset styles on ghost
         activeGhost.style.transform = "scale(1.05)";
         activeGhost.style.opacity = "0.9";
         activeGhost.style.position = 'fixed';
         activeGhost.style.zIndex = '9999';
         activeGhost.style.pointerEvents = 'none';
-        activeGhost.style.width = `${originalElement.offsetWidth}px`;
+        // Fix width - context dependent
+        activeGhost.style.width = placeholder.style.width; 
         
         document.body.appendChild(activeGhost);
         
@@ -327,19 +339,96 @@ function initTouchDrag(e, index, originalElement) {
 
     const updateGhostPosition = (x, y) => {
         if (!activeGhost) return;
-        activeGhost.style.left = `${x - (originalElement.offsetWidth / 2)}px`;
-        activeGhost.style.top = `${y - (originalElement.offsetHeight / 2)}px`;
         
-        // Highlight logic
+        // Move Ghost
+        activeGhost.style.left = `${x - (activeGhost.offsetWidth / 2)}px`;
+        activeGhost.style.top = `${y - (activeGhost.offsetHeight / 2)}px`;
+        
+        // Check for Court hover
         document.querySelectorAll('.court').forEach(c => c.classList.remove('court-drag-over'));
         const hoverElement = document.elementFromPoint(x, y);
         const court = hoverElement?.closest('.court');
-        if (court) court.classList.add('court-drag-over');
+        
+        if (court) {
+             court.classList.add('court-drag-over');
+             // If over court, maybe hide placeholder or move it to end of queue to signify "leaving"?
+             // For now, let's just leave placeholder where it last was or move to end?
+        } else {
+            // Check for Queue Reordering
+            const queueContainer = document.getElementById('playerQueue');
+            // We only care if we are hovering the queue container or its children
+            if (queueContainer && (queueContainer.contains(hoverElement) || hoverElement === queueContainer)) {
+                updatePlaceholderPosition(x, y, queueContainer);
+            }
+        }
+    };
+
+    const updatePlaceholderPosition = (x, y, container) => {
+        if (!placeholder) return;
+
+        // Get all cards EXCEPT the placeholder and the hidden original
+        // (Original is hidden, text nodes etc ignored by using .children and class check)
+        const siblings = Array.from(container.children).filter(
+            c => c !== placeholder && c !== originalElement && c.classList.contains('player-card')
+        );
+
+        // Find closest sibling
+        let closest = null;
+        let minDistance = Infinity;
+
+        siblings.forEach(child => {
+            const rect = child.getBoundingClientRect();
+            // Distance to center of card
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const dist = Math.hypot(x - cx, y - cy);
+            
+            if (dist < minDistance) {
+                minDistance = dist;
+                closest = child;
+            }
+        });
+
+        if (closest) {
+            const rect = closest.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2; // Not strictly used if we just use center-distance logic
+            
+            // Logic: If close to this card, are we "before" or "after" it?
+            // Since it's a flex wrap, "index" is the truth. 
+            // Simple approach: Place visual placeholder BEFORE the closest element.
+            // But if we are clearly passed it (to the right/bottom), maybe AFTER?
+            
+            // Refined "Sortable" logic:
+            // Swap placeholder with closest if we are "past" the midpoint of the closest relative to placeholder?
+            // Simpler: Just insertBefore the closest.
+            // If dragging to the end, closest will be the last one.
+            // If we are to the right of the last one, we might want to append.
+            
+            // Let's stick to: "Insert before closest" 
+            // UNLESS closest is the last one AND we are to the right/bottom of it.
+            
+            const isLast = (siblings.indexOf(closest) === siblings.length - 1);
+            if (isLast) {
+                // Check if we are "after" the last card
+                // Assuming LTR + Top-Down
+                const isAfter = (y > rect.bottom) || (y > rect.top && x > cx);
+                if (isAfter) {
+                    container.appendChild(placeholder);
+                    return;
+                }
+            }
+            container.insertBefore(placeholder, closest);
+        } else {
+            // No siblings (empty queue) or too far?
+            if (siblings.length === 0) {
+                 container.appendChild(placeholder);
+            }
+        }
     };
 
     const onPointerMove = (ev) => {
         if (!localIsDragging) {
-            // Check for movement threshold to CANCEL drag timer (assumed scroll)
             const moveX = Math.abs(ev.clientX - startX);
             const moveY = Math.abs(ev.clientY - startY);
             if (moveX > 10 || moveY > 10) {
@@ -347,7 +436,7 @@ function initTouchDrag(e, index, originalElement) {
                 cleanupListeners();
             }
         } else {
-            if (ev.cancelable) ev.preventDefault(); // Prevent scrolling
+            if (ev.cancelable) ev.preventDefault(); 
             updateGhostPosition(ev.clientX, ev.clientY);
         }
     };
@@ -358,11 +447,8 @@ function initTouchDrag(e, index, originalElement) {
         if (localIsDragging) {
             processDrop(ev.clientX, ev.clientY);
         } else {
-            // It was a click/tap
+            // Click logic
             if (Math.abs(ev.clientX - startX) < 10 && Math.abs(ev.clientY - startY) < 10) {
-                // Manually trigger click if we prevented default? 
-                // We didn't prevent default on pointerdown, so native click should fire.
-                // But just in case we need to trigger the card click logic:
                  const name = originalElement.getAttribute('data-name');
                  if (name && !ev.target.closest('.delete-btn')) {
                      handleSidebarPlayerClick(name);
@@ -380,15 +466,30 @@ function initTouchDrag(e, index, originalElement) {
 
     const cleanupListeners = () => {
         isDraggingGlobal = false;
+        
+        // Remove Ghost
         if (activeGhost) activeGhost.remove();
         activeGhost = null;
         
-        // Reset Original
-        originalElement.style.transform = "";
-        originalElement.style.opacity = "";
-        originalElement.style.transition = "";
+        // We do NOT remove placeholder here immediately, because reorderQueue needs to read its index.
+        // OR if reorderQueue is NOT called (cancelled?), we must restore original.
+        
+        // If processDrop ran, it handles logic. But this cleanup runs after processDrop? 
+        // No, processDrop calls reorderQueue which re-renders list (destroying placeholder & original).
+        // So checking if placeholder is still connected is a good check for "cancelled/failed" drop.
+        
+        if (placeholder && placeholder.isConnected) {
+            // Drop failed or didn't result in re-render? Restore original.
+            originalElement.style.display = '';
+            placeholder.remove();
+        } else if (originalElement && originalElement.isConnected) {
+             // Just specific style reset if it wasn't destroyed
+             originalElement.style.display = '';
+             originalElement.style.transform = "";
+             originalElement.style.opacity = "";
+             originalElement.style.transition = "";
+        }
 
-        // Remove Hover classes
         document.querySelectorAll('.court').forEach(c => c.classList.remove('court-drag-over'));
         
         window.removeEventListener('pointermove', onPointerMove);
@@ -399,24 +500,34 @@ function initTouchDrag(e, index, originalElement) {
     const processDrop = (x, y) => {
         const pointElement = document.elementFromPoint(x, y);
         const dropCourt = pointElement?.closest('.court');
-        const dropCard = pointElement?.closest('.queue-container .player-card');
-        const dropQueue = pointElement?.closest('.queue-container');
+        const queueContainer = document.getElementById('playerQueue');
         
         if (dropCourt) {
+            // Dropped on Court
             const courtId = dropCourt.id.split('-')[1];
             handleDropToCourt(null, courtId, index); 
-        } else if (dropCard) {
-            const targetName = dropCard.getAttribute('data-name');
-            const targetIndex = queue.findIndex(p => p.name === targetName);
-            if (targetIndex !== -1) {
-                reorderQueue(index, targetIndex);
+            // Note: handleDropToCourt rerenders queue, so placeholder is gone.
+        } else {
+            // Dropped elsewhere - assume reorder if placeholder exists
+            if (placeholder && placeholder.parentNode === queueContainer) {
+                // Calculate new index based on placeholder position
+                // We want the index in the list of "Real Players"
+                
+                // Get all children that act as valid slots (excluding hidden original)
+                const children = Array.from(queueContainer.children);
+                // The original is still in the list but hidden. The placeholder is in the list.
+                // We want to know: "If I strip the original out, where is the placeholder?"
+                
+                const filtered = children.filter(c => c !== originalElement);
+                const newIndex = filtered.indexOf(placeholder);
+                
+                if (newIndex !== -1) {
+                    reorderQueue(index, newIndex);
+                }
             }
-        } else if (dropQueue) {
-            reorderQueue(index, queue.length);
         }
     };
 
-    // START TIMER: 300ms hold to pick up
     dragTimer = setTimeout(startDrag, 300);
 
     window.addEventListener('pointermove', onPointerMove, { passive: false });

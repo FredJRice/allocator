@@ -714,3 +714,15 @@ header h1 {
         height: calc(100% - 0px) !important;
     }
 }
+
+/* ==========================================
+   9. DRAG & DROP PLACEHOLDER
+   ========================================== */
+.queue-placeholder {
+    background: rgba(0, 0, 0, 0.05);
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    pointer-events: none; /* Allows pointer events to pass through to container/other cards */
+}
