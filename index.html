@@ -24,13 +24,15 @@
             <h1>Court Queue</h1>
         </header>
 
-        <main class="app-main">
+        <main class="layout-container">
             <aside id="sidePanel" class="sidebar-container">
                 <div class="column">
-                    <div class="header-with-action">
-                        <button id="openPoolModalBtn" class="plus-btn"><span style="font-size:1.2rem">Add Players</span></button>
+                    <div class="queue-container">
+                        <button id="openPoolModalBtn" class="plus-btn">
+                            <span class="btn-label-lg">Add Players</span>
+                        </button>
+                        <div id="playerQueue" class="queue-list"></div>
                     </div>
-                    <div id="playerQueue" class="queue-container"></div>
                 </div>
             </aside>
 
@@ -48,15 +50,16 @@
                     <button id="addAllToQueueBtn" class="add-all-btn">Add All</button>
                     <button id="closePoolModalBtn" class="close-pool-btn">Close</button>
                 </div>
-                </div>
+            </div>
         </div>
 
         <div id="addPlayerModal" class="modal">
             <div id="addPlayerModalContent" class="modal-content">
                 <h3>Add New Player</h3>
-                <input type="text" id="newPlayerName" placeholder="Enter Name..." style="width:92%; padding:10px; margin-bottom:10px;">
-                <br>
-                <div style="display: flex; justify-content: center; gap: 10px;">
+                <label for="newPlayerName" style="display:none">Player Name</label>
+                <input type="text" id="newPlayerName" class="modal-input" placeholder="Enter Name...">
+                
+                <div class="modal-action-row">
                     <button id="saveToPoolBtn">Save to Pool</button>
                     <button id="cancelAddPlayerBtn">Cancel</button>
                 </div>
@@ -65,9 +68,15 @@
 
         <footer class="main-footer">
             <div class="footer-controls">
-                <button id="openSettingsBtn" class="footer-btn"><span style="font-size:1.3rem">Settings</span></button>
-                <button id="openInfoBtn" class="footer-btn"><span style="font-size:1.3rem">Help</span></button>
-                <button id="clearAllBtn" class="footer-btn danger"><span style="font-size:1.2rem">Clear All</span></button>
+                <button id="openSettingsBtn" class="footer-btn">
+                    <span class="btn-label-xl">Settings</span>
+                </button>
+                <button id="openInfoBtn" class="footer-btn">
+                    <span class="btn-label-xl">Help</span>
+                </button>
+                <button id="clearAllBtn" class="footer-btn danger">
+                    <span class="btn-label-lg">Clear All</span>
+                </button>
             </div>
         </footer>
     </app-main>

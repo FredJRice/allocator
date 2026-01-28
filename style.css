@@ -60,6 +60,19 @@ header {
     box-sizing: border-box;
 }
 
+header h1 {
+    text-shadow: 1px 1px 0px rgba(222, 237, 236, 0.5); /* Crisp light shadow to create depth */
+    font-weight: 800;
+    letter-spacing: 1px;
+    font-size: 3rem;
+    line-height: 50px;
+    display: inline-block;
+    color: rgb(39, 38, 96);
+    margin: 0;
+    padding: 0 16px;
+    border-radius: 6px;
+}
+
 
 /* ==========================================
    4. MAIN LAYOUT & SIDEBAR (QUEUE)
@@ -115,18 +128,27 @@ main {
     min-width: 0;
     min-height: 0;
     display: flex;
-    flex-wrap: wrap;       /* Allow wrapping if needed, but direction is crucial */
-    flex-direction: row;   /* Changed to row so players tile horizontally or wrap */
-    justify-content: center;
-    overflow-y: auto;
+    flex-direction: column; /* Stack button and list vertically */
+    overflow: hidden; /* Wrapper handles outline, inner list handles scroll */
     border: 2px solid black; 
     border-radius: 8px;
     background: rgba(250, 250, 250, 0.5);
     padding: 15px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.queue-list {
+    width: 100%;
+    flex: 1; /* Take remaining space */
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
     align-content: flex-start;
     gap: 15px;
-    position: relative;
-    box-sizing: border-box;
+    overflow-y: auto; /* Scroll happens here */
+    min-height: 0;
 }
 
 .main-footer {
@@ -185,7 +207,7 @@ main {
     padding-right: 10px;
     padding-bottom: 100px;
     box-sizing: border-box;
-    scrollbar-width:thin;
+    scrollbar-width: thin;
 }
 
 .court {
@@ -482,19 +504,6 @@ main {
     pointer-events: none;
 }
 
-header h1 {
-    text-shadow: 1px 1px 0px rgba(222, 237, 236, 0.5); /* Crisp light shadow to create depth */
-    font-weight: 800;
-    letter-spacing: 1px;
-    font-size: 3rem;
-    line-height: 50px;
-    display: inline-block;
-    color: rgb(39, 38, 96);
-    margin: 0;
-    padding: 0 16px;
-    border-radius: 6px;
-}
-
 /* Ensure desktop width remains 50% */
 @media (min-width: 1025px) {
     /* Since these are inside app-main (which is 50vw), they should fill it */
@@ -512,7 +521,8 @@ header h1 {
         width: 286px;
         flex-shrink: 0;
     }
-    .app-main {
+    /* Rename .app-main to .layout-container to avoid confusion with the custom element app-main */
+    .layout-container {
         width: 100%;
         height: 100%;
     }
@@ -537,7 +547,8 @@ header h1 {
         /* padding-top is now handled by the main class with env() */
     }
 
-    .app-main {
+    /* Rename .app-main to .layout-container to avoid confusion with the custom element app-main */
+    .layout-container {
         display: flex !important;
         flex-direction: row !important;
         flex: 1 1 auto !important;
@@ -564,11 +575,13 @@ header h1 {
 
     /* Sidebar Mobile Actions */
     #sidePanel .header-with-action {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 15px;
+        display: none;
+    }
+
+    /* Mobile specific adjustment for the embedded button */
+    .queue-container .plus-btn {
+        margin-bottom: 10px;
+        order: -1; /* Ensure it stays at top */
     }
 
     #sidePanel .header-with-action h2 {
@@ -579,8 +592,9 @@ header h1 {
         color: #4a5568;
     }
 
+    /* Old selector for external button - remove or repurpose? 
+       Use generic selector to ensure button updates on mobile */
     #sidePanel .plus-btn {
-        order: 1;
         width: 100% !important;
         height: 48px !important;
         border-radius: 8px !important;
@@ -651,8 +665,6 @@ header h1 {
     .pool-modal-content {
     width: 95% !important;
     max-width: 600px;
-    /* Changed from 85vh to a safe calculat
-    height: calc(100dvh - 200px) !important;ion */
     height: calc(100vh - 200px) !important; 
     display: flex;
     flex-direction: column;
@@ -727,4 +739,30 @@ header h1 {
     box-sizing: border-box;
     flex-shrink: 0;
     pointer-events: none; /* Allows pointer events to pass through to container/other cards */
+}
+
+/* ==========================================
+   10. UTILITIES & HELPERS
+   ========================================== */
+.modal-input {
+    width: 92%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.modal-action-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-label-lg {
+    font-size: 1.2rem;
+}
+
+.btn-label-xl {
+    font-size: 1.3rem;
 }

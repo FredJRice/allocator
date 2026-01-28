@@ -67,13 +67,12 @@ function createPlayerCard(name, courtId = null) {
     div.className = 'player-card';
     
     // START FIX: Only queue cards should act as "draggable=false" for our custom touch logic to work
-    // Court cards (which are standard) can remain draggable for now if needed, or false if not.
+    // Court cards are currently locked (cannot be dragged between courts yet) to prevent confusion.
+    div.draggable = false; 
+    
     if (!courtId) {
-        div.draggable = false; // Disable native drag for queue items to prevent conflict
         div.style.touchAction = "pan-y"; 
-    } else {
-        div.draggable = true; 
-    }
+    } 
     // END FIX
 
     div.setAttribute('data-name', name);
@@ -85,10 +84,7 @@ function createPlayerCard(name, courtId = null) {
     
     if (courtId) {
         btn.addEventListener('click', (e) => removeSingleFromCourt(e, courtId, div));
-        div.ondragstart = (e) => {
-            e.dataTransfer.setData("playerName", name);
-            e.dataTransfer.setData("fromCourt", courtId);
-        };
+        // Drag logic from court not currently implemented
     } else {
         // div.addEventListener('click', () => handleSidebarPlayerClick(name)); REMOVED to prevent double fire
     }
