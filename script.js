@@ -65,7 +65,17 @@ document.addEventListener('DOMContentLoaded', () => {
 function createPlayerCard(name, courtId = null) {
     const div = document.createElement('div');
     div.className = 'player-card';
-    div.draggable = true;
+    
+    // START FIX: Only queue cards should act as "draggable=false" for our custom touch logic to work
+    // Court cards (which are standard) can remain draggable for now if needed, or false if not.
+    if (!courtId) {
+        div.draggable = false; // Disable native drag for queue items to prevent conflict
+        div.style.touchAction = "pan-y"; 
+    } else {
+        div.draggable = true; 
+    }
+    // END FIX
+
     div.setAttribute('data-name', name);
     
     const btn = document.createElement('button');
@@ -293,43 +303,50 @@ function initTouchDrag(e, index, originalElement) {
     let localIsDragging = false;
     let activeGhost = null;
     let placeholder = null;
-    let hasMovedPlaceholder = false;
 
-    // Feedback: User has touched
-    originalElement.style.transform = "scale(0.98)";
-    originalElement.style.transition = "transform 0.1s";
+    // START FIX: 300ms delay for touch, 0ms for mouse
+    const isTouch = (e.pointerType === 'touch');
+    const dragDelay = isTouch ? 300 : 0; 
+
+    // Feedback
+    if (isTouch) {
+        originalElement.style.transform = "scale(0.95)";
+        originalElement.style.transition = "transform 0.1s";
+    }
 
     const startDrag = () => {
         localIsDragging = true;
         isDraggingGlobal = true;
         
-        // Haptic feedback
-        if (navigator.vibrate) navigator.vibrate(50);
+        if (isTouch && navigator.vibrate) navigator.vibrate(50);
         
         // 1. Setup Placeholder
         placeholder = document.createElement('div');
         placeholder.className = 'queue-placeholder';
-        placeholder.style.width = getComputedStyle(originalElement).width;
-        placeholder.style.height = getComputedStyle(originalElement).height;
-        // Insert placeholder where the original element is
+        
+        // Calculate dims
+        const rect = originalElement.getBoundingClientRect();
+        placeholder.style.width = `${rect.width}px`;
+        placeholder.style.height = `${rect.height}px`;
+
         originalElement.parentNode.insertBefore(placeholder, originalElement);
 
-        // 2. Hide Original (but keep in DOM for now to maintain indices if needed, though we rely on placeholder for new index)
+        // 2. Hide Original 
         originalElement.style.display = 'none';
 
         // 3. Create Ghost
         activeGhost = originalElement.cloneNode(true);
-        activeGhost.style.display = 'block'; // Ensure it's visible since original is hidden
+        activeGhost.style.display = 'block'; 
         activeGhost.classList.add('drag-ghost');
-        
+        activeGhost.style.width = `${rect.width}px`;
+        activeGhost.style.height = `${rect.height}px`;
+
         // Reset styles on ghost
         activeGhost.style.transform = "scale(1.05)";
         activeGhost.style.opacity = "0.9";
         activeGhost.style.position = 'fixed';
         activeGhost.style.zIndex = '9999';
         activeGhost.style.pointerEvents = 'none';
-        // Fix width - context dependent
-        activeGhost.style.width = placeholder.style.width; 
         
         document.body.appendChild(activeGhost);
         
@@ -522,13 +539,16 @@ function initTouchDrag(e, index, originalElement) {
                 const newIndex = filtered.indexOf(placeholder);
                 
                 if (newIndex !== -1) {
-                    reorderQueue(index, newIndex);
+                    let targetIndex = newIndex;
+                    // If moving down the list, we need to account for the shift
+                    if (newIndex >= index) targetIndex++; 
+                    reorderQueue(index, targetIndex);
                 }
             }
         }
     };
 
-    dragTimer = setTimeout(startDrag, 300);
+    dragTimer = setTimeout(startDrag, dragDelay);
 
     window.addEventListener('pointermove', onPointerMove, { passive: false });
     window.addEventListener('pointerup', onPointerUp);
@@ -594,7 +614,10 @@ function renderQueue() {
             
             reorderQueue(srcIdx, targetIdx);
         }
-    };
+    };// START FIX: Remove native dragstart listener for queue items
+        // div.ondragstart = (e) => e.dataTransfer.setData("queueIndex", index);
+        
+        // Attach Pointer Events (Custom DnD)
 
     queue.forEach((player, index) => {
         const div = createPlayerCard(player.name);
