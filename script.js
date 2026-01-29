@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderQueue();
     setupModals();
     renderDatabase(); // CRITICAL: This draws the players in the modal
+    loadSession(); // Restore previous session if available
 });
 
     // --- FOOTER BUTTONS ---
@@ -47,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             generateCourts();
             renderQueue();
             renderDatabase();
+            localStorage.removeItem('allocatorSession');
         }
     };
 
@@ -95,6 +97,57 @@ function createPlayerCard(name, courtId = null) {
     div.appendChild(btn);
     div.appendChild(document.createTextNode(name));
     return div;
+}
+
+// --- State Management ---
+
+function backupState() {
+    const courts = document.querySelectorAll('.court');
+    const state = [];
+    courts.forEach(court => {
+        const idStr = court.getAttribute('id');
+        if (!idStr) return;
+        const id = parseInt(idStr.replace('court-', ''));
+        const container = document.getElementById(`slots-${id}`);
+        let players = [];
+        if (container) {
+            players = Array.from(container.querySelectorAll('.player-card')).map(c => ({ name: c.getAttribute('data-name') }));
+        }
+        
+        let seconds = 0;
+        if (timers[id]) {
+            seconds = timers[id].seconds;
+        }
+
+        state.push({ id, players, seconds });
+    });
+    return state;
+}
+
+function restoreState(savedState) {
+    let playersToQueue = [];
+    
+    savedState.forEach(data => {
+        // If court still exists (id <= new config.count)
+        if (data.id <= config.count) {
+            if (data.players.length > 0) {
+                updateCourtDisplay(data.id, data.players);
+                // Restore timer (updateCourtDisplay resets it to 0, so we overwrite)
+                startTimer(data.id, data.seconds);
+            }
+        } else {
+            // Court removed, return players to queue
+            data.players.forEach(p => {
+                playersToQueue.push({ name: p.name, id: Date.now() + Math.random() });
+            });
+        }
+    });
+
+    if (playersToQueue.length > 0) {
+        queue = [...queue, ...playersToQueue];
+        renderQueue();
+        renderDatabase();
+    }
 }
 
 // --- Court Logic ---
@@ -185,6 +238,13 @@ function generateCourts() {
 function updateCourtDisplay(courtId, playerArray) {
     const container = document.getElementById(`slots-${courtId}`);
     if (!container) return;
+
+    // Preserve existing timer if running
+    let savedTime = 0;
+    if (timers[courtId] && timers[courtId].seconds > 0) {
+        savedTime = timers[courtId].seconds;
+    }
+
     container.innerHTML = '';
     
     if (!playerArray || playerArray.length === 0) {
@@ -206,7 +266,7 @@ function updateCourtDisplay(courtId, playerArray) {
             }
             container.appendChild(createPlayerCard(p.name, courtId));
         });
-        startTimer(courtId);
+        startTimer(courtId, savedTime);
     }
 }
 
@@ -675,9 +735,9 @@ function renderQueue() {
 
 // --- Timers ---
 
-function startTimer(courtId) {
+function startTimer(courtId, initialSeconds = 0) {
     if (timers[courtId]) clearInterval(timers[courtId].interval);
-    timers[courtId] = { seconds: 0, interval: null };
+    timers[courtId] = { seconds: initialSeconds, interval: null };
     const el = document.getElementById(`timer-${courtId}`);
     
     // Reset classes
@@ -819,6 +879,9 @@ function setupModals() {
                 return;
             }
 
+            // Backup state before changing config (prevents data loss)
+            const savedState = backupState();
+
             config.count = count;
             config.timerOrange = orange;
             config.timerRed = red;
@@ -827,6 +890,10 @@ function setupModals() {
             localStorage.setItem('allocatorConfig', JSON.stringify(config));
 
             generateCourts();
+            
+            // Restore state
+            restoreState(savedState);
+
             closeSettings();
         });
     }
@@ -907,4 +974,51 @@ document.addEventListener('dragend', function() {
     // Also remove any custom ghost classes you might have
     const customGhosts = document.querySelectorAll('.drag-ghost');
     customGhosts.forEach(g => g.remove());
+});
+
+// --- Session Persistence ---
+
+function saveSession() {
+    const sessionCallback = {
+        queue: queue,
+        courts: backupState(), 
+        timestamp: Date.now()
+    };
+    try {
+        localStorage.setItem('allocatorSession', JSON.stringify(sessionCallback));
+    } catch (e) {
+        console.warn("Storage quota exceeded or error saving session", e);
+    }
+}
+
+function loadSession() {
+    const saved = localStorage.getItem('allocatorSession');
+    if (saved) {
+        try {
+            const session = JSON.parse(saved);
+            
+            // Restore Queue
+            if (session.queue && Array.isArray(session.queue)) {
+                queue = session.queue;
+                renderQueue(); 
+            }
+            
+            // Restore Courts
+            if (session.courts && Array.isArray(session.courts)) {
+                // We use restoreState, but we need to ensure generateCourts has run first (it is in DOMContentLoaded)
+                restoreState(session.courts); 
+            }
+            
+        } catch (e) {
+            console.error("Failed to load session", e);
+        }
+    }
+}
+
+// Hook into lifecycle events
+window.addEventListener('beforeunload', saveSession);
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+        saveSession();
+    }
 });

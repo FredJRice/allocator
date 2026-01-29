@@ -260,6 +260,7 @@ main {
     align-items: center;
     justify-content: center;
     gap: 10px;
+    margin-bottom: 15px; /* Ensure space before timer on all devices */
 }
 
 .vs-text {
