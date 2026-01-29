@@ -77,6 +77,13 @@ function createPlayerCard(name, courtId = null) {
 
     div.setAttribute('data-name', name);
     
+    // Prevent context menu (copy/paste/select) on long press
+    div.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    });
+
     const btn = document.createElement('button');
     btn.className = 'delete-btn';
     btn.innerText = '×';
