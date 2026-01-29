@@ -303,23 +303,33 @@ function reorderQueue(fromIndex, toIndex) {
 let isDraggingGlobal = false;
 
 function initTouchDrag(e, index, originalElement) {
+    // FIX: preventDefault on pointerdown often needed for touch actions to prevent scroll/native behaviors
+    // But we need to be careful not to block clicking. 
+    // We handle that by only preventing if we actually start dragging (after delay or movement).
+    // However, for immediate capture, sometimes we need setPointerCapture.
+    
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     if (isDraggingGlobal) return;
+
+    // IMPORTANT: Storing the ID for cleaning up properly later
+    const pointerId = e.pointerId;
 
     const startX = e.clientX;
     const startY = e.clientY;
     
     let dragTimer = null;
     let localIsDragging = false;
+    let localHasMoved = false; // Track if movement occurred to differentiate click vs drag attempt
     let activeGhost = null;
     let placeholder = null;
 
-    // START FIX: 300ms delay for touch, 0ms for mouse
+    // START FIX: 300ms delay for touch, 0ms for mouse ? 
+    // Actually, making it 150ms feels snappier, but let's stick to 300 for safety against scroll.
     const isTouch = (e.pointerType === 'touch');
-    const dragDelay = isTouch ? 300 : 0; 
+    const dragDelay = isTouch ? 250 : 50;  // Reduced slightly for better feel, added small delay for mouse to prevent accidental drags on click
 
-    // Feedback
     if (isTouch) {
+        // Visual feedback immediately on touch press
         originalElement.style.transform = "scale(0.95)";
         originalElement.style.transition = "transform 0.1s";
     }
@@ -327,6 +337,15 @@ function initTouchDrag(e, index, originalElement) {
     const startDrag = () => {
         localIsDragging = true;
         isDraggingGlobal = true;
+        
+        // Capture pointer to ensure we get events even if user moves finger fast off the element or over other elements (like iframes/courts)
+        if (originalElement.setPointerCapture) {
+            try {
+                originalElement.setPointerCapture(pointerId);
+            } catch (err) {
+                console.log("Pointer capture failed", err);
+            }
+        }
         
         if (isTouch && navigator.vibrate) navigator.vibrate(50);
         
@@ -339,7 +358,9 @@ function initTouchDrag(e, index, originalElement) {
         placeholder.style.width = `${rect.width}px`;
         placeholder.style.height = `${rect.height}px`;
 
-        originalElement.parentNode.insertBefore(placeholder, originalElement);
+        if (originalElement.parentNode) {
+            originalElement.parentNode.insertBefore(placeholder, originalElement);
+        }
 
         // 2. Hide Original 
         originalElement.style.display = 'none';
@@ -373,13 +394,13 @@ function initTouchDrag(e, index, originalElement) {
         
         // Check for Court hover
         document.querySelectorAll('.court').forEach(c => c.classList.remove('court-drag-over'));
+        
+        // Temporarily hide ghost to see what's under it? No, pointer-events:none handles that.
         const hoverElement = document.elementFromPoint(x, y);
         const court = hoverElement?.closest('.court');
         
         if (court) {
              court.classList.add('court-drag-over');
-             // If over court, maybe hide placeholder or move it to end of queue to signify "leaving"?
-             // For now, let's just leave placeholder where it last was or move to end?
         } else {
             // Check for Queue Reordering
             const queueContainer = document.getElementById('playerQueue');
@@ -417,51 +438,40 @@ function initTouchDrag(e, index, originalElement) {
         });
 
         if (closest) {
-            const rect = closest.getBoundingClientRect();
-            const cx = rect.left + rect.width / 2;
-            const cy = rect.top + rect.height / 2; // Not strictly used if we just use center-distance logic
-            
-            // Logic: If close to this card, are we "before" or "after" it?
-            // Since it's a flex wrap, "index" is the truth. 
-            // Simple approach: Place visual placeholder BEFORE the closest element.
-            // But if we are clearly passed it (to the right/bottom), maybe AFTER?
-            
-            // Refined "Sortable" logic:
-            // Swap placeholder with closest if we are "past" the midpoint of the closest relative to placeholder?
-            // Simpler: Just insertBefore the closest.
-            // If dragging to the end, closest will be the last one.
-            // If we are to the right of the last one, we might want to append.
-            
-            // Let's stick to: "Insert before closest" 
-            // UNLESS closest is the last one AND we are to the right/bottom of it.
-            
-            const isLast = (siblings.indexOf(closest) === siblings.length - 1);
-            if (isLast) {
-                // Check if we are "after" the last card
-                // Assuming LTR + Top-Down
-                const isAfter = (y > rect.bottom) || (y > rect.top && x > cx);
-                if (isAfter) {
-                    container.appendChild(placeholder);
-                    return;
-                }
-            }
             container.insertBefore(placeholder, closest);
         } else {
             // No siblings (empty queue) or too far?
             if (siblings.length === 0) {
+                 container.appendChild(placeholder);
+            } else {
+                // If dragging to the very end
                  container.appendChild(placeholder);
             }
         }
     };
 
     const onPointerMove = (ev) => {
+        if (ev.pointerId !== pointerId) return;
+
+        // Determine if we have moved enough to consider it a drag attempt (vs a shaky tap)
+        const moveX = Math.abs(ev.clientX - startX);
+        const moveY = Math.abs(ev.clientY - startY);
+        
         if (!localIsDragging) {
-            const moveX = Math.abs(ev.clientX - startX);
-            const moveY = Math.abs(ev.clientY - startY);
-            if (moveX > 10 || moveY > 10) {
-                clearTimeout(dragTimer);
-                cleanupListeners();
-            }
+             if (moveX > 10 || moveY > 10) {
+                 localHasMoved = true;
+                 if (!isTouch) {
+                     // Mouse: start strictly after movement + delay done (handled by timer, but if moved a lot cancel timer?)
+                     // Actually logic is: timer starts drag. movement cancels timer IF we want strict "hold" logic.
+                     // But for "drag immediately" on mouse, we just start.
+                     // For touch, we want HOLD.
+                     if (isTouch) {
+                          // If moved too much before timer fires, cancel drag (it's a scroll)
+                          clearTimeout(dragTimer);
+                          cleanupListeners();
+                     }
+                 }
+             }
         } else {
             if (ev.cancelable) ev.preventDefault(); 
             updateGhostPosition(ev.clientX, ev.clientY);
@@ -469,24 +479,29 @@ function initTouchDrag(e, index, originalElement) {
     };
 
     const onPointerUp = (ev) => {
+        if (ev.pointerId !== pointerId) return;
         clearTimeout(dragTimer);
         
         if (localIsDragging) {
             processDrop(ev.clientX, ev.clientY);
         } else {
-            // Click logic
-            if (Math.abs(ev.clientX - startX) < 10 && Math.abs(ev.clientY - startY) < 10) {
+            // Click logic - Only if we haven't moved significantly or started dragging
+            // Also need to ensure we didn't just cancel a long press
+            if (!localHasMoved) {
                  const name = originalElement.getAttribute('data-name');
                  if (name && !ev.target.closest('.delete-btn')) {
                      handleSidebarPlayerClick(name);
                  }
             }
+            // Reset styles if it was just a press
+            originalElement.style.transform = "";
         }
         
         cleanupListeners();
     };
     
-    const onPointerCancel = () => {
+    const onPointerCancel = (ev) => {
+        if (ev.pointerId !== pointerId) return;
         clearTimeout(dragTimer);
         cleanupListeners();
     };
@@ -494,23 +509,22 @@ function initTouchDrag(e, index, originalElement) {
     const cleanupListeners = () => {
         isDraggingGlobal = false;
         
+        // Release capture if we had it
+        if (originalElement.hasPointerCapture && originalElement.hasPointerCapture(pointerId)) {
+             try {
+                originalElement.releasePointerCapture(pointerId);
+             } catch(e) {}
+        }
+        
         // Remove Ghost
         if (activeGhost) activeGhost.remove();
         activeGhost = null;
         
-        // We do NOT remove placeholder here immediately, because reorderQueue needs to read its index.
-        // OR if reorderQueue is NOT called (cancelled?), we must restore original.
-        
-        // If processDrop ran, it handles logic. But this cleanup runs after processDrop? 
-        // No, processDrop calls reorderQueue which re-renders list (destroying placeholder & original).
-        // So checking if placeholder is still connected is a good check for "cancelled/failed" drop.
-        
+        // Cleanup Placeholder & Restore Original if Drop failed (implied if placeholder still exists)
         if (placeholder && placeholder.isConnected) {
-            // Drop failed or didn't result in re-render? Restore original.
             originalElement.style.display = '';
             placeholder.remove();
         } else if (originalElement && originalElement.isConnected) {
-             // Just specific style reset if it wasn't destroyed
              originalElement.style.display = '';
              originalElement.style.transform = "";
              originalElement.style.opacity = "";
@@ -529,11 +543,12 @@ function initTouchDrag(e, index, originalElement) {
         const dropCourt = pointElement?.closest('.court');
         const queueContainer = document.getElementById('playerQueue');
         
+        // FIX: Ensure we handle touch drops correctly for custom DnD
         if (dropCourt) {
             // Dropped on Court
             const courtId = dropCourt.id.split('-')[1];
+            // Passing the current index from the initTouchDrag closure
             handleDropToCourt(null, courtId, index); 
-            // Note: handleDropToCourt rerenders queue, so placeholder is gone.
         } else {
             // Dropped elsewhere - assume reorder if placeholder exists
             if (placeholder && placeholder.parentNode === queueContainer) {
@@ -637,7 +652,19 @@ function renderQueue() {
             renderQueue();
             renderDatabase();
         });
-        div.ondragstart = (e) => e.dataTransfer.setData("queueIndex", index);
+        
+        // FIX: Mobile/Touch Logic vs Desktop logic collision
+        // We do NOT want native dragstart on touch devices because we are using pointer events.
+        // We only enable native dragstart if we are strictly on desktop mouse? 
+        // Actually, let's keep native 'dragstart' for desktop compatibility but ensure it doesn't fire for touch.
+        // However, we set draggable="false" in createPlayerCard, so ondragstart shouldn't fire natively effectively?
+        // Wait, creating player card sets draggable=false. So ondragstart is useless?
+        // Correct. If draggable is false, native drag won't start.
+        // But our initTouchDrag handles both mouse and touch via pointer events.
+        
+        // Remove this line to avoid confusion since draggable is false anyway
+        // div.ondragstart = (e) => e.dataTransfer.setData("queueIndex", index);
+        
         div.addEventListener('pointerdown', (e) => initTouchDrag(e, index, div));
         container.appendChild(div);
     });
