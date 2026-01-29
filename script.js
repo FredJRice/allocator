@@ -14,7 +14,15 @@ if (players.length === 0) {
 
 let queue = [];
 let timers = {};
-let config = { count: 4 };
+
+// Load config from storage or use defaults
+let savedConfig = JSON.parse(localStorage.getItem('allocatorConfig'));
+let config = savedConfig || { 
+    count: 4, 
+    timerOrange: 10, 
+    timerRed: 20 
+};
+
 let courtNames = JSON.parse(localStorage.getItem('courtNames')) || [];
 let focusedCourtId = null;
 let activeGhost = null;
@@ -29,16 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FOOTER BUTTONS ---
 
-    // 1. Settings (Replaces the old 'applySettings' logic)
-    document.getElementById('openSettingsBtn').onclick = () => {
-        const val = prompt("Enter number of courts:", config.count);
-        if (val !== null) {
-            config.count = parseInt(val) || 4;
-            generateCourts();
-        }
-    };
-
-
+    // 1. Settings logic is now in setupModals()
 
     // 3. Clear All
     document.getElementById('clearAllBtn').onclick = () => {
@@ -680,13 +679,35 @@ function startTimer(courtId) {
     if (timers[courtId]) clearInterval(timers[courtId].interval);
     timers[courtId] = { seconds: 0, interval: null };
     const el = document.getElementById(`timer-${courtId}`);
+    
+    // Reset classes
+    if (el) {
+        el.classList.remove('timer-orange', 'timer-red');
+        el.classList.add('timer-green');
+    }
+
     timers[courtId].interval = setInterval(() => {
         timers[courtId].seconds++;
         let sec = timers[courtId].seconds;
         const h = String(Math.floor(sec / 3600)).padStart(2, '0');
         const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
         const s = String(sec % 60).padStart(2, '0');
-        if (el) el.innerText = `${h}:${m}:${s}`;
+        if (el) {
+            el.innerText = `${h}:${m}:${s}`;
+            
+            // Traffic Light Logic
+            const mins = sec / 60;
+            if (mins >= config.timerRed) {
+                 el.classList.remove('timer-green', 'timer-orange');
+                 el.classList.add('timer-red');
+            } else if (mins >= config.timerOrange) {
+                 el.classList.remove('timer-green', 'timer-red');
+                 el.classList.add('timer-orange');
+            } else {
+                 el.classList.remove('timer-orange', 'timer-red');
+                 el.classList.add('timer-green');
+            }
+        }
     }, 1000);
 }
 
@@ -696,7 +717,10 @@ function stopTimer(courtId) {
         delete timers[courtId];
     }
     const el = document.getElementById(`timer-${courtId}`);
-    if (el) el.innerText = "00:00:00";
+    if (el) {
+        el.innerText = "00:00:00";
+        el.classList.remove('timer-green', 'timer-orange', 'timer-red');
+    }
 }
 
 // --- Modals & Database ---
@@ -705,10 +729,12 @@ function setupModals() {
     const poolModal = document.getElementById("poolModal");
     const addModal = document.getElementById("addPlayerModal");
     const helpModal = document.getElementById("helpModal");
+    const settingsModal = document.getElementById("settingsModal");
 
     const closePool = () => poolModal.style.display = "none";
     const closeAddPlayer = () => addModal.style.display = "none";
     const closeHelp = () => helpModal.style.display = "none";
+    const closeSettings = () => settingsModal.style.display = "none";
 
     const addAllBtn = document.getElementById('addAllToQueueBtn');
     if (addAllBtn) {
@@ -731,17 +757,86 @@ function setupModals() {
         addModal.style.display = "block";
     });
 
-    // Info Button Logic Moved Here
+    // Info Button Logic
     const infoBtn = document.getElementById('openInfoBtn');
+    const helpTextContent = document.querySelector('.help-text-content');
+    const scrollIndicator = document.getElementById('helpScrollIndicator');
+
+    const checkHelpScroll = () => {
+        if (!helpTextContent || !scrollIndicator) return;
+        const isScrollable = helpTextContent.scrollHeight > helpTextContent.clientHeight;
+        const isAtBottom = helpTextContent.scrollTop + helpTextContent.clientHeight >= helpTextContent.scrollHeight - 5;
+        
+        if (isScrollable && !isAtBottom) {
+            scrollIndicator.style.display = 'flex'; // Changed to flex to match CSS
+        } else {
+            scrollIndicator.style.display = 'none';
+        }
+    };
+
     if (infoBtn) {
         infoBtn.addEventListener('click', () => {
             helpModal.style.display = "block";
+            setTimeout(checkHelpScroll, 50);
         });
     }
+
+    if (helpTextContent) {
+        helpTextContent.addEventListener('scroll', checkHelpScroll);
+    }
+    
+    // Settings Button Logic
+    const settingsBtn = document.getElementById('openSettingsBtn');
+    const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+    const courtInput = document.getElementById('courtCountInput');
+    const orangeInput = document.getElementById('timerOrangeInput');
+    const redInput = document.getElementById('timerRedInput');
+
+    if (settingsBtn) {
+        settingsBtn.onclick = () => { // Changed to onclick to override any previous assignment if exists
+            courtInput.value = config.count;
+            if (orangeInput) orangeInput.value = config.timerOrange;
+            if (redInput) redInput.value = config.timerRed;
+            settingsModal.style.display = "block";
+        };
+    }
+
+    if (saveSettingsBtn) {
+        saveSettingsBtn.addEventListener('click', () => {
+            let count = parseInt(courtInput.value);
+            if (isNaN(count) || count < 1) {
+                count = 1;
+            } else if (count > 20) {
+                alert("For best performance, the maximum number of courts is limited to 20.");
+                count = 20;
+            }
+
+             // Timer Settings
+            let orange = parseInt(orangeInput.value) || 40;
+            let red = parseInt(redInput.value) || 45;
+
+             if (red <= orange) {
+                alert("Red warning time must be greater than Orange warning time.");
+                return;
+            }
+
+            config.count = count;
+            config.timerOrange = orange;
+            config.timerRed = red;
+            
+            // Save to storage
+            localStorage.setItem('allocatorConfig', JSON.stringify(config));
+
+            generateCourts();
+            closeSettings();
+        });
+    }
+
 
     document.getElementById('closePoolModalBtn')?.addEventListener('click', closePool);
     document.getElementById('cancelAddPlayerBtn')?.addEventListener('click', closeAddPlayer);
     document.getElementById('closeHelpModalBtn')?.addEventListener('click', closeHelp);
+    document.getElementById('cancelSettingsBtn')?.addEventListener('click', closeSettings);
 
     document.getElementById('saveToPoolBtn').addEventListener('click', () => {
         const input = document.getElementById('newPlayerName');
@@ -759,6 +854,7 @@ function setupModals() {
         if (event.target == poolModal) closePool();
         if (event.target == addModal) closeAddPlayer();
         if (event.target == helpModal) closeHelp();
+        if (event.target == settingsModal) closeSettings();
     });
 }
 

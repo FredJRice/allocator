@@ -70,19 +70,50 @@
             <div class="modal-content help-modal-content">
                 <h3>How to use Court Queue</h3>
                 <div class="help-text-content">
-                    <ol>
+                    <ul>
                         <li>Click on <strong>Add Players</strong>.</li>
                         <li>Tap on a player to add them to the queue, or select <strong>Add All</strong>.</li>
-                        <li>Drag a player to a court, or tap a court to auto-fill.</li>
-                    </ol>
-                    <hr>
-                    <p class="copyright-text">
-                        Copyright © 2026 Court Queue - Fred Rice<br>
-                        Version 1.0.0 | Updated January 2026
-                    </p>
+                        <li>Tap a court to auto-fill or drag player card to a court. Timers start/stop automatically.</li>
+                        <li>To add next players to a court, tap the court again.</li>
+                        <li>To remove a player from a court, tap 'x'.</li>
+                        <li>To edit or delete a player from the pool tap 'x'.</li>
+                        <li>Max 4 players per court.</li>
+                        <li>Use <strong>Clear All</strong> to reset courts & queue.</li>
+                    </ul>
                 </div>
+                <div id="helpScrollIndicator" class="scroll-indicator">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 5v14M19 12l-7 7-7-7"/>
+                    </svg>
+                </div>
+                <p class="copyright-text">
+                    Copyright © 2026 Court Queue - Fred Rice<br>
+                    Version 1.0.0 | Updated January 2026
+                </p>
                 <div class="modal-footer">
                     <button id="closeHelpModalBtn" class="close-pool-btn">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <h3>Settings</h3>
+                <label for="courtCountInput" class="settings-label">Number of Courts:</label>
+                <input type="number" id="courtCountInput" class="modal-input" min="1" max="20" placeholder="e.g. 4">
+                <p class="settings-helper-text">Max 20 courts supported.</p>
+
+                <hr style="width: 90%; border: 0; border-top: 1px solid #eee; margin: 15px auto;">
+                
+                <label for="timerOrangeInput" class="settings-label">Timer - Orange Warning (mins):</label>
+                <input type="number" id="timerOrangeInput" class="modal-input" min="1" placeholder="e.g. 40">
+
+                <label for="timerRedInput" class="settings-label">Timer - Red Warning (mins):</label>
+                <input type="number" id="timerRedInput" class="modal-input" min="1" placeholder="e.g. 45">
+                
+                <div class="modal-action-row">
+                    <button id="saveSettingsBtn">Save</button>
+                    <button id="cancelSettingsBtn">Cancel</button>
                 </div>
             </div>
         </div>
