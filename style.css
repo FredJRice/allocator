@@ -285,9 +285,9 @@ main {
     word-break: break-word; /* Forces long strings like 'Ksjsj...' to break */
     line-height: 1.3;       /* Better spacing for wrapped text */
     touch-action: pan-y !important;
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-touch-callout: none;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    -webkit-touch-callout: none !important;
 }
 
 .player-card.active-in-system {

@@ -83,6 +83,12 @@ function createPlayerCard(name, courtId = null) {
         e.stopPropagation();
         return false;
     });
+    
+    // Prevent text selection start (additional layer for iOS highlight)
+    div.addEventListener('selectstart', (e) => {
+        e.preventDefault();
+        return false;
+    });
 
     const btn = document.createElement('button');
     btn.className = 'delete-btn';
