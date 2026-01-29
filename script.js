@@ -38,16 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // 2. Info
-    document.getElementById('openInfoBtn').onclick = () => {
-        alert(`How to use Court Queue:
-          1. Click on 'Add Players'
-          2. Tap on a player to add them or select 'Add all'
-          3. Click a court to auto add or drag player to the court
-          
-          Copyright © 2026 Court Queue - Fred Rice
-          Version 1.0.0 | Updated January 2026`);
-    };
+
 
     // 3. Clear All
     document.getElementById('clearAllBtn').onclick = () => {
@@ -713,8 +704,11 @@ function stopTimer(courtId) {
 function setupModals() {
     const poolModal = document.getElementById("poolModal");
     const addModal = document.getElementById("addPlayerModal");
+    const helpModal = document.getElementById("helpModal");
+
     const closePool = () => poolModal.style.display = "none";
     const closeAddPlayer = () => addModal.style.display = "none";
+    const closeHelp = () => helpModal.style.display = "none";
 
     const addAllBtn = document.getElementById('addAllToQueueBtn');
     if (addAllBtn) {
@@ -737,8 +731,17 @@ function setupModals() {
         addModal.style.display = "block";
     });
 
+    // Info Button Logic Moved Here
+    const infoBtn = document.getElementById('openInfoBtn');
+    if (infoBtn) {
+        infoBtn.addEventListener('click', () => {
+            helpModal.style.display = "block";
+        });
+    }
+
     document.getElementById('closePoolModalBtn')?.addEventListener('click', closePool);
     document.getElementById('cancelAddPlayerBtn')?.addEventListener('click', closeAddPlayer);
+    document.getElementById('closeHelpModalBtn')?.addEventListener('click', closeHelp);
 
     document.getElementById('saveToPoolBtn').addEventListener('click', () => {
         const input = document.getElementById('newPlayerName');
@@ -755,6 +758,7 @@ function setupModals() {
     window.addEventListener('click', (event) => {
         if (event.target == poolModal) closePool();
         if (event.target == addModal) closeAddPlayer();
+        if (event.target == helpModal) closeHelp();
     });
 }
 
