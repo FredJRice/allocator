@@ -683,7 +683,7 @@ function startTimer(courtId) {
     // Reset classes
     if (el) {
         el.classList.remove('timer-orange', 'timer-red');
-        el.classList.add('timer-green');
+        // Default is dark grey (defined in CSS for .timer-display)
     }
 
     timers[courtId].interval = setInterval(() => {
@@ -698,14 +698,13 @@ function startTimer(courtId) {
             // Traffic Light Logic
             const mins = sec / 60;
             if (mins >= config.timerRed) {
-                 el.classList.remove('timer-green', 'timer-orange');
+                 el.classList.remove('timer-orange');
                  el.classList.add('timer-red');
             } else if (mins >= config.timerOrange) {
-                 el.classList.remove('timer-green', 'timer-red');
+                 el.classList.remove('timer-red');
                  el.classList.add('timer-orange');
             } else {
                  el.classList.remove('timer-orange', 'timer-red');
-                 el.classList.add('timer-green');
             }
         }
     }, 1000);
@@ -719,7 +718,7 @@ function stopTimer(courtId) {
     const el = document.getElementById(`timer-${courtId}`);
     if (el) {
         el.innerText = "00:00:00";
-        el.classList.remove('timer-green', 'timer-orange', 'timer-red');
+        el.classList.remove('timer-orange', 'timer-red');
     }
 }
 
