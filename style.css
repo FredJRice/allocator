@@ -65,13 +65,13 @@ header {
 }
 
 header h1 {
-    text-shadow: 1px 1px 0px rgba(222, 237, 236, 0.5); /* Crisp light shadow to create depth */
+    text-shadow: 1px 1px 0px rgba(16, 17, 17, 0.5); /* Crisp light shadow to create depth */
     font-weight: 800;
     letter-spacing: 1px;
     font-size: 3rem;
     line-height: 50px;
     display: inline-block;
-    color: rgb(39, 38, 96);
+    color: rgb(0, 0, 0);
     margin: 0;
     padding: 0 16px;
     border-radius: 6px;
