@@ -17,6 +17,10 @@
 /* ==========================================
    2. GLOBAL RESET & BODY
    ========================================== */
+* {
+    box-sizing: border-box;
+}
+
 html, body {
     height: 100%;
     width: 100vw;
@@ -133,7 +137,7 @@ main {
     border: 2px solid black; 
     border-radius: 8px;
     background: rgba(250, 250, 250, 0.5);
-    padding: 15px;
+    padding: 12px 4px;
     box-sizing: border-box;
     position: relative;
 }
@@ -146,7 +150,8 @@ main {
     flex-direction: row;
     justify-content: center;
     align-content: flex-start;
-    gap: 15px;
+    gap: 10px;
+    padding-top: 10px;
     overflow-y: auto; /* Scroll happens here */
     min-height: 0;
 }
@@ -342,7 +347,7 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .delete-btn {
@@ -563,9 +568,9 @@ main {
     }
     
     #sidePanel {
-        width: 209px;
-        height: calc(100vh - 250px) !important;
-        height: calc(100dvh - 250px) !important;
+        width: 250px;
+        height: calc(100vh - 190px) !important;
+        height: calc(100dvh - 190px) !important;
         overflow: hidden;
         background-color: transparent;
         border-right: none;
@@ -581,7 +586,7 @@ main {
     /* Mobile specific adjustment for the embedded button */
     .queue-container .plus-btn {
         margin-bottom: 10px;
-        order: -1; /* Ensure it stays at top */
+        order: -1; 
     }
 
     #sidePanel .header-with-action h2 {
@@ -647,6 +652,13 @@ main {
         font-size: 1rem;
         padding: 15px 10px 15px 30px !important;
     }
+    
+    /* Ensure the cards in the queue don't get too wide/squished */
+    .queue-list .player-card {
+        width: 160px !important; 
+        max-width: 100%;
+        margin: 5px auto !important;
+    }
 
     .court .player-card {
         width: 80% !important; 
@@ -710,13 +722,22 @@ main {
 }
 @media (max-width: 600px) {
     #sidePanel {
-        width: 181px;
+        width: 200px;
     }
 
     .player-card {
         width: 157px !important;
         font-size: 0.9rem;
         padding: 10px 8px 10px 20px !important;
+    }
+    
+    /* FIX: Use a fixed width that is guaranteed to fit within the 181px sidebar
+       Calculation: 181px (Sidebar) - 20px (Pad) - 4px (Border) - 8px (Pad) = 149px Available
+       We use 135px to leave ~7px gap on each side. */
+    .queue-list .player-card {
+        width: 135px !important; 
+        max-width: 100%;
+        margin: 5px auto !important;
     }
 
     .court .player-card {
