@@ -1022,3 +1022,8 @@ document.addEventListener('visibilitychange', () => {
         saveSession();
     }
 });
+
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('showInstructions') === 'true') {
+    alert("To install: Tap the 'Share' icon and select 'Add to Home Screen'!");
+}
