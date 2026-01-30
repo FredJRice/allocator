@@ -1023,7 +1023,39 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
+/* --- PWA Installation Overlay Logic --- */
 const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.get('showInstructions') === 'true') {
-    alert("To install: Tap the 'Share' icon and select 'Add to Home Screen'!");
+
+if (urlParams.get('install') === 'true') {
+    // 1. Create the darkened background overlay
+    const overlay = document.createElement('div');
+    overlay.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; justify-content:center; align-items:center; z-index:9999; padding:20px; box-sizing:border-box; color:white; font-family:sans-serif; text-align:center;";
+    
+    // 2. Create the instruction box
+    const box = document.createElement('div');
+    box.style = "background:#1c1c1e; padding:30px; border-radius:15px; border: 1px solid #3a3a3c; max-width:350px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);";
+    
+    // 3. Detect device to show correct instructions
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    
+    const instructions = isIOS 
+        ? "Tap the <strong>Share icon</strong> (square with up arrow) and select <strong>'Add to Home Screen'</strong>."
+        : "Tap the <strong>Menu icon</strong> (three dots) and select <strong>'Install App'</strong> or 'Add to Home Screen'.";
+
+    box.innerHTML = `
+        <h2 style="margin-top:0; color: #0a84ff;">Install App</h2>
+        <p style="font-size: 1.1rem; line-height:1.5;">To use this as a permanent fixture on your court-side tablet or phone:</p>
+        <p style="background:#2c2c2e; padding:15px; border-radius:10px; border: 1px solid #444; font-size: 0.95rem;">${instructions}</p>
+        <button id="close-install" style="margin-top:20px; padding:12px 24px; border:none; border-radius:8px; background:#0a84ff; color:white; cursor:pointer; font-weight:bold; font-size:1rem;">Got it!</button>
+    `;
+
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    // 4. Close button logic
+    document.getElementById('close-install').onclick = () => {
+        overlay.remove();
+        // This removes the "?install=true" from the address bar so it doesn't pop up again if they refresh
+        window.history.replaceState({}, document.title, window.location.pathname);
+    };
 }
