@@ -1,4 +1,4 @@
-# [Live Demo: Try CourtQueue Here](https://fredjrice.github.io/court-queue)
+# [Live Demo: Try CourtQueue Here](https://fredjrice.github.io/court-queue?install=true)
 
 ![CourtQueue App Screenshot](screenshot.png)
 
