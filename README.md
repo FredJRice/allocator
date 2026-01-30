@@ -26,6 +26,7 @@ Automated Pairing: The app automatically pulls the next two available players fr
 PWA Ready: Can be "Added to Home Screen" on iOS and Android to function like a native app without an app store download.
 
 🛠️ Tech Stack
+
 Frontend: HTML5, CSS3, JavaScript (ES6+)
 
 Deployment: GitHub Pages
@@ -33,6 +34,7 @@ Deployment: GitHub Pages
 App Logic: Managed via local state to ensure fast, responsive performance on-site.
 
 📱 How to Use
+
 Join: Click "Add Player", enter your name in the input field and click "Close."
 
 Play: The first players in the queue click on a free court and the timer starts.
