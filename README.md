@@ -2,7 +2,10 @@
 
 ![CourtQueue App Screenshot](screenshot.png)
 
----
+## 📲 Installation (PWA)
+This app is a Progressive Web App. To install it on your device:
+* **iOS (Safari):** Tap the **Share** button (square with up arrow) -> **Add to Home Screen**.
+* **Android (Chrome):** Tap the **three dots** menu -> **Install app** or **Add to Home screen**.
 
 CourtQueue: Squash Club Rotation Manager
 A lightweight, digital alternative to the traditional "wooden peg and wheel" rotation systems used in squash and racket clubs. Designed for "Club Nights" to ensure fair, transparent, and automated player rotation.
